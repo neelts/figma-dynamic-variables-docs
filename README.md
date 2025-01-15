@@ -1,1 +1,0 @@
-# figma-dynamic-variables-docs
