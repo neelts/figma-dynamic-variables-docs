@@ -345,14 +345,23 @@ function loadMonaco(){
   monacoP ??= new Promise((resolve, reject) => {
     if (!window.require) return reject(new Error("loader missing"));
     window.require.config({ paths: { vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.55.1/min/vs" } });
-    window.require(["vs/editor/editor.main"], () => resolve(window.monaco), reject);
+    window.require(["vs/editor/editor.main"], () => { syncMonacoTheme(); resolve(window.monaco); }, reject);
   });
   return monacoP;
 }
-const monacoTheme = () => document.documentElement.className === "figma-dark" ? "vs-dark" : "vs";
-new MutationObserver(() => {
-  if (window.monaco) window.monaco.editor.setTheme(monacoTheme());
-}).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+// Theme from BOTH signals: the html class (set by the head script) and the
+// media query directly — and re-assert after monaco loads, so no load-order
+// or browser quirk can leave editors on the wrong theme.
+const darkMq = matchMedia("(prefers-color-scheme: dark)");
+const monacoTheme = () => {
+  const cls = document.documentElement.classList;
+  if (cls.contains("figma-dark")) return "vs-dark";
+  if (cls.contains("figma-light")) return "vs";
+  return darkMq.matches ? "vs-dark" : "vs"; // no class set — fall back to the OS
+};
+const syncMonacoTheme = () => { if (window.monaco) window.monaco.editor.setTheme(monacoTheme()); };
+new MutationObserver(syncMonacoTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+darkMq.addEventListener("change", syncMonacoTheme);
 
 const SHARED_EDITOR_OPTIONS = {
   automaticLayout: true, minimap: { enabled: false }, wordWrap: "on",
@@ -367,7 +376,8 @@ const SHARED_EDITOR_OPTIONS = {
 async function mountEditor(host, value, onSave){
   try {
     const monaco = await loadMonaco();
-    const ed = monaco.editor.create(host, { ...SHARED_EDITOR_OPTIONS, value, theme: monacoTheme() });
+    const ed = monaco.editor.create(host, { ...SHARED_EDITOR_OPTIONS, value });
+    syncMonacoTheme();
     const layout = () => {
       const h = ed.getContentHeight();
       host.style.height = h + "px";
