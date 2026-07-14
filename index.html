@@ -48,36 +48,37 @@ table.ref th{background:var(--figma-color-bg-secondary)}
 .play .hint{font-size:12px;color:var(--figma-color-text-secondary);margin:0}
 .play .colcap{font-size:11px;font-weight:600;padding:10px 14px 4px;color:var(--figma-color-text-secondary);
   text-transform:uppercase;letter-spacing:.04em}
-.vrow{display:flex;align-items:stretch;min-height:40px;padding:0 8px;border-bottom:1px solid var(--figma-color-border)}
+.vrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:stretch;min-height:40px;padding:0 8px;border-bottom:1px solid var(--figma-color-border)}
 .vrow:hover{background:var(--figma-color-bg-hover)}
-.vrow .vmain{display:flex;align-items:center;gap:4px;flex:1;min-width:0;padding-right:8px}
+.vrow .vmain{display:flex;align-items:center;gap:4px;min-width:0;padding-right:8px}
 .vrow .ticon{width:24px;height:24px;flex:none;opacity:.9}
 .vrow .vname{font-family:var(--font-mono);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.modestrip{flex:1;min-width:0;display:flex;align-items:stretch}
+.modestrip{min-width:0;display:flex;align-items:stretch;overflow:hidden}
 .mcell{display:flex;align-items:center;gap:6px;flex:none;width:120px;min-width:120px;padding:0 12px;
   border-left:1px solid var(--figma-color-border);overflow:hidden;font-size:11px;color:var(--figma-color-text-secondary)}
 .mcell .truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--font-mono)}
 .mcell.header{font-weight:500;color:var(--figma-color-text-secondary);user-select:none;height:28px}
-.headrow{display:flex;align-items:stretch;padding:0 8px;border-bottom:1px solid var(--figma-color-border);
+.headrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:stretch;padding:0 8px;border-bottom:1px solid var(--figma-color-border);
   background:var(--figma-color-bg-secondary)}
-.headrow .vmain{flex:1;min-width:0;display:flex;align-items:center;font-size:11px;font-weight:500;
-  color:var(--figma-color-text-secondary);padding-left:28px}
+.headrow .vmain{min-width:0;display:flex;align-items:center;font-size:11px;font-weight:500;color:var(--figma-color-text-secondary);padding-left:28px}
 .sw{display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid var(--figma-color-border);flex:none}
 .err{color:var(--figma-color-text-danger);font-size:11px;font-family:var(--font-mono);white-space:normal}
 .editor-wrapper{padding:12px;border-bottom:1px solid var(--figma-color-border);background:var(--figma-color-bg)}
 .editor-wrapper .mhost{width:100%;min-height:16px}
-.mcell input[type=text]{width:100%;background:transparent;color:var(--figma-color-text);border:1px solid transparent;
-  border-radius:4px;padding:2px 4px;font:11px var(--font-mono);outline:none}
-.mcell input[type=text]:hover{border-color:var(--figma-color-border)}
+.mcell input[type=text]{width:100%;background:var(--figma-color-bg);color:var(--figma-color-text);
+  border:1px solid var(--figma-color-border);
+  border-radius:4px;padding:2px 4px;margin-left:-5px;font:11px var(--font-mono);outline:none}
+.mcell input[type=text]:hover{border-color:var(--figma-color-border-strong,#888)}
 .mcell input[type=text]:focus{border-color:var(--figma-color-border-selected)}
 .mcell input.num{-moz-appearance:textfield;appearance:textfield}
 .mcell input.num::-webkit-outer-spin-button,.mcell input.num::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .nameinput{background:transparent;color:var(--figma-color-text);border:1px dashed var(--figma-color-border-strong,#888);
   border-radius:4px;padding:2px 6px;font:12px var(--font-mono);width:110px;outline:none}
 .nameinput:focus{border-style:solid;border-color:var(--figma-color-border-selected)}
-.swbtn{display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid transparent;
-  border-radius:4px;padding:2px 4px;cursor:pointer;font:11px var(--font-mono);color:var(--figma-color-text);min-width:0}
-.swbtn:hover{border-color:var(--figma-color-border)}
+.swbtn{display:inline-flex;align-items:center;gap:6px;background:var(--figma-color-bg);
+  border:1px solid var(--figma-color-border);
+  border-radius:4px;padding:2px 8px 2px 4px;margin-left:-5px;cursor:pointer;font:11px var(--font-mono);color:var(--figma-color-text);min-width:0}
+.swbtn:hover{border-color:var(--figma-color-border-strong,#888)}
 .gfbox{border-bottom:1px solid var(--figma-color-border)}
 .gfbox .gfcap{font-size:11px;font-weight:600;padding:10px 14px 4px;color:var(--figma-color-text-secondary);
   text-transform:uppercase;letter-spacing:.04em;margin:0}
@@ -312,6 +313,13 @@ function cd(input){
 }
 const hexToFig = h => { const c = cl.rgb(cl.parse(h)); return { r:c.r, g:c.g, b:c.b, a:c.alpha==null?1:c.alpha }; };
 const figToHex = v => cl.formatHex({ mode:"rgb", r:v.r, g:v.g, b:v.b });
+// Figma's panel shows hex UPPERCASE without the leading # (alpha as "NN%")
+const figmaHexText = v => {
+  const hex = figToHex(v).slice(1).toUpperCase();
+  const a = v.a == null ? 1 : v.a;
+  return a < 1 ? `${hex} ${Math.round(a * 100)}%` : hex;
+};
+const hexText = h => h.replace(/^#/, "").toUpperCase();
 function coerceColor(v){
   try{
     if (v==null) return v;
@@ -366,6 +374,8 @@ async function mountEditor(host, value, onSave){
       ed.layout({ width: host.clientWidth, height: h });
     };
     ed.onDidContentSizeChange(layout); layout();
+    new ResizeObserver(layout).observe(host.parentElement);
+    if (document.fonts?.ready) document.fonts.ready.then(layout);
     let t = null;
     const save = () => { t = null; onSave(ed.getValue()); };
     ed.onDidChangeModelContent(() => { if (t) clearTimeout(t); t = setTimeout(save, 1000); });
@@ -534,7 +544,7 @@ function openPicker(btn, hexVal, onChange){
   closePop();
   const pop = document.createElement("div");
   pop.className = "pickpop";
-  pop.innerHTML = `<hex-color-picker color="${hexVal}"></hex-color-picker><div class="hexrow"><input type="text" value="${hexVal}" spellcheck="false"></div>`;
+  pop.innerHTML = `<hex-color-picker color="${hexVal}"></hex-color-picker><div class="hexrow"><input type="text" value="${hexText(hexVal)}" spellcheck="false"></div>`;
   document.body.appendChild(pop);
   const r = btn.getBoundingClientRect();
   const ph = pop.offsetHeight || 240;
@@ -543,8 +553,12 @@ function openPicker(btn, hexVal, onChange){
   pop.style.top = (above ? r.top + scrollY - ph - 6 : r.bottom + scrollY + 6) + "px";
   const picker = pop.querySelector("hex-color-picker");
   const input = pop.querySelector("input");
-  picker.addEventListener("color-changed", e => { input.value = e.detail.value; onChange(e.detail.value); });
-  input.addEventListener("change", () => { if (window.culori.parse(input.value)) { picker.color = input.value; onChange(input.value); } });
+  picker.addEventListener("color-changed", e => { input.value = hexText(e.detail.value); onChange(e.detail.value); });
+  input.addEventListener("change", () => {
+    const raw = input.value.trim();
+    const cand = raw.startsWith("#") || !/^[0-9a-fA-F]{3,8}$/.test(raw) ? raw : "#"+raw;
+    if (window.culori.parse(cand)) { picker.color = cand; onChange(cand); }
+  });
   openPop = pop;
 }
 
@@ -555,7 +569,7 @@ function cellContent(v, mode){
   if (st.err[mode]) return `<span class="err" title="${esc(st.err[mode]).replace(/"/g,"&quot;")}">⚠ ${esc(st.err[mode])}</span>`;
   const val = st.out[mode];
   if (val===undefined||val===null) return `<span class="truncate">—</span>`;
-  if (v.type==="COLOR" && isFig(val)){ const h = figToHex(val); return `<span class="sw" style="background:${h}"></span><span class="truncate">${h}</span>`; }
+  if (v.type==="COLOR" && isFig(val)){ return `<span class="sw" style="background:${figToHex(val)}"></span><span class="truncate">${figmaHexText(val)}</span>`; }
   if (typeof val==="number") return `<span class="truncate">${Math.round(val*1000)/1000}</span>`;
   return `<span class="truncate">${esc(val)}</span>`;
 }
@@ -592,8 +606,8 @@ function mount(root, ex){
         } else if (v.editable !== false){
           const val = v.values[m];
           if (v.type==="COLOR"){
-            const hx = typeof val==="string" ? val.toLowerCase() : figToHex(val);
-            html += `<div class="mcell"><button class="swbtn" data-pick='${JSON.stringify([v.id, m])}'><span class="sw" style="background:${hx}"></span><span class="truncate">${hx}</span></button></div>`;
+            const hx = typeof val==="string" ? (val.startsWith("#")?val:"#"+val).toLowerCase() : figToHex(val);
+            html += `<div class="mcell"><button class="swbtn" data-pick='${JSON.stringify([v.id, m])}'><span class="sw" style="background:${hx}"></span><span class="truncate">${hexText(hx)}</span></button></div>`;
           } else if (v.type==="FLOAT"){
             html += `<div class="mcell"><input type="text" inputmode="decimal" class="num" value="${val}" data-base='${JSON.stringify([v.id, m, "number"])}'></div>`;
           } else {
@@ -641,7 +655,7 @@ function mount(root, ex){
       openPicker(btn, cur, hx => {
         v.values[m] = hx;
         btn.querySelector(".sw").style.background = hx;
-        btn.querySelector(".truncate").textContent = hx;
+        btn.querySelector(".truncate").textContent = hexText(hx);
         reval(150);
       });
     });
