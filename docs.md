@@ -33,6 +33,10 @@ Prefer a real editor over description fields? *Plugins → Dynamic Variables →
 Open Dynamic Variables Editor*: your collections as a tree, a full code editor
 with syntax highlighting and inline errors — and the AI menu (below).
 
+> The `{{ }}` wrapper lives in the description field — that's what you see
+> when editing descriptions directly (the only way in 1.x). The editor hides
+> the wrapper by default and shows just the expression.
+
 ---
 
 ## Referencing variables
