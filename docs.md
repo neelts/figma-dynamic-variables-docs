@@ -236,14 +236,28 @@ Two hand-set variables — a `city` STRING and a `use-fahrenheit` BOOLEAN —
 drive a geocoding fetch that feeds a weather fetch:
 
 ```js
-{{ fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&name=" + encodeURIComponent("$city"))
-     .then(r => r.json())
-     .then(g => fetch("https://api.open-meteo.com/v1/forecast?current=apparent_temperature"
-         + "&latitude=" + g.results[0].latitude + "&longitude=" + g.results[0].longitude
-         + "&temperature_unit=" + ($use-fahrenheit ? "fahrenheit" : "celsius"))
-       .then(r => r.json())
-       .then(d => Math.round(d.current.apparent_temperature) + ($use-fahrenheit ? "°F" : "°C"))) }}
+{{
+const unit = $use-fahrenheit ? "fahrenheit" : "celsius";
+const suffix = $use-fahrenheit ? "°F" : "°C";
+fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&name=" + encodeURIComponent("$city"))
+  .then(r => r.json())
+  .then(g => {
+    const place = g.results[0];
+    const url = "https://api.open-meteo.com/v1/forecast?current=apparent_temperature"
+      + "&latitude=" + place.latitude
+      + "&longitude=" + place.longitude
+      + "&temperature_unit=" + unit;
+    return fetch(url);
+  })
+  .then(r => r.json())
+  .then(d => Math.round(d.current.apparent_temperature) + suffix);
+}}
 ```
+
+Multi-statement expressions read top-to-bottom: set up locals with `const`,
+and the **last statement** is the variable's value (a trailing semicolon is
+fine). `return` works inside the arrow bodies — it's only a *top-level*
+`return` that's a syntax error.
 
 …or simply `{{ new Date().toLocaleTimeString("en-GB") }}`.
 
