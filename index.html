@@ -87,6 +87,26 @@ figure.shot{margin:16px 0;border:1.5px dashed var(--figma-color-border-strong,#8
 figure.shot .cam{font-size:20px;display:block;margin-bottom:6px}
 figure.shot figcaption{font-size:12px;color:var(--figma-color-text-secondary);max-width:520px;margin:0 auto}
 figure.shot figcaption strong{color:var(--figma-color-text)}
+
+svg.arr{width:13px;height:13px;vertical-align:-2px;margin:0 3px;opacity:.7;color:var(--figma-color-text-secondary)}
+/* full-width expression rows */
+tr.exprrow td{padding:2px 8px 8px;border-bottom:1px solid var(--figma-color-border)}
+.exprview{display:flex;align-items:flex-start;gap:6px;background:var(--figma-color-bg);border:1px solid var(--figma-color-border);
+  border-radius:8px;padding:7px 10px;cursor:pointer;position:relative;transition:border-color .12s}
+.exprview:hover{border-color:var(--figma-color-border-selected)}
+.exprview .brace{color:var(--figma-color-text-tertiary);font:12px ui-monospace,Menlo,monospace;user-select:none}
+.exprview code{flex:1;background:none;padding:0;font-size:12px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.exprview .edithint{position:absolute;right:8px;top:6px;font-size:10px;color:var(--figma-color-text-tertiary);
+  opacity:0;transition:opacity .12s;pointer-events:none}
+.exprview:hover .edithint{opacity:1}
+.medit{border:1px solid var(--figma-color-border-selected);border-radius:8px;overflow:hidden;background:var(--figma-color-bg)}
+.medit textarea{width:100%;border:none;outline:none;background:var(--figma-color-bg);color:var(--figma-color-text);
+  font:12px/1.5 ui-monospace,Menlo,monospace;padding:8px 10px;resize:vertical;min-height:34px}
+.medit .mhint{font-size:10px;color:var(--figma-color-text-tertiary);padding:2px 10px 4px;border-top:1px solid var(--figma-color-border)}
+.nameinput{background:var(--figma-color-bg);color:var(--figma-color-text);border:1px dashed var(--figma-color-border-strong,#888);
+  border-radius:5px;padding:2px 6px;font:12px ui-monospace,Menlo,monospace;width:110px;outline:none}
+.nameinput:focus{border-style:solid;border-color:var(--figma-color-border-selected)}
+.gfbox .exprview code{font-size:11.5px}
 </style>
 </head>
 <body>
@@ -101,14 +121,14 @@ figure.shot figcaption strong{color:var(--figma-color-text)}
 </nav>
 
 <h2 id="try">Try it — right here <span class="pill">live</span></h2>
-<p>These tables are <em>editable</em>. Change the base color and watch the derived shades recompute — exactly what the plugin does to your real Figma variables on every update.</p>
+<p>These tables are <em>editable</em> — and so are the expressions: click any <code>{{ }}</code> row to edit it in a real code editor. Change the base color and watch the derived shades recompute — exactly what the plugin does to your real Figma variables on every update.</p>
 <div class="play" data-example="hello"></div>
 <p class="dim">Every example on this page runs in your browser through a small sandbox that mimics the plugin's expression semantics (same syntax, same <code>cd</code>/<code>cl</code> libraries, colors handled as real Figma <code>{r,g,b,a}</code> objects). The real plugin adds monitoring, rename-proof references, a visual editor and AI assistance on top — and every example here is pinned as a test against the real engine in the plugin repository.</p>
 
 <h2 id="start">Start here — your first dynamic variable</h2>
 <ol>
 <li><strong>Write a formula in a description.</strong> Select a variable in Figma's variables panel, and in its <em>description</em> field write an expression between double curly braces, referencing another variable with <code>$</code>:<br><code>{{ $base-spacing * 2 }}</code></li>
-<li><strong>Run the plugin.</strong> <em>Plugins → Dynamic Variables → Update Once</em> (one shot) or <em>Start Monitoring Changes</em> (updates live as you edit; pause/resume and interval are in the menu).</li>
+<li><strong>Run the plugin.</strong> <em>Plugins<svg class="arr" aria-hidden="true" viewBox="0 0 16 16"><path d="M2.5 8h10.4M8.8 3.9 12.9 8l-4.1 4.1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Dynamic Variables<svg class="arr" aria-hidden="true" viewBox="0 0 16 16"><path d="M2.5 8h10.4M8.8 3.9 12.9 8l-4.1 4.1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Update Once</em> (one shot) or <em>Start Monitoring Changes</em> (updates live as you edit; pause/resume and interval are in the menu).</li>
 <li><strong>That's it.</strong> The variable's value is now computed. Edit <code>base-spacing</code> and it follows. Rename a referenced variable — references fix themselves.</li>
 </ol>
 <figure class="shot" role="img" aria-label="Screenshot: Figma's variables panel with a variable selected; its description field contains the expression double-curly-brace $base-spacing times 2, and the value column shows the computed result.">
@@ -116,7 +136,7 @@ figure.shot figcaption strong{color:var(--figma-color-text)}
 <figcaption><strong>Screenshot to capture:</strong> the variables panel, one variable selected, description field showing <code>{{ $base-spacing * 2 }}</code>, value column showing the computed result. Crop to the panel; ~1200px wide.</figcaption>
 </figure>
 <div class="play" data-example="first"></div>
-<p>Prefer a real editor over description fields? Open <em>Plugins → Dynamic Variables → Open Dynamic Variables Editor</em>: a tree of your collections with a full code editor (syntax highlighting, inline errors) — and the AI menu.</p>
+<p>Prefer a real editor over description fields? Open <em>Plugins<svg class="arr" aria-hidden="true" viewBox="0 0 16 16"><path d="M2.5 8h10.4M8.8 3.9 12.9 8l-4.1 4.1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Dynamic Variables<svg class="arr" aria-hidden="true" viewBox="0 0 16 16"><path d="M2.5 8h10.4M8.8 3.9 12.9 8l-4.1 4.1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Open Dynamic Variables Editor</em>: a tree of your collections with a full code editor (syntax highlighting, inline errors) — and the AI menu.</p>
 <figure class="shot" role="img" aria-label="Screenshot: the Dynamic Variables Editor window — collections tree on the left, code editor on the right with a highlighted expression and an inline error message under one line.">
 <span class="cam">📷</span>
 <figcaption><strong>Screenshot to capture:</strong> the Dynamic Variables Editor — collections tree (left), code editor (right) with an expression open and one inline error visible. Full window; ~1600px wide.</figcaption>
@@ -157,7 +177,7 @@ figure.shot figcaption strong{color:var(--figma-color-text)}
 <p>You don't have to write these formulas yourself. In the editor (<em>Open Dynamic Variables Editor</em>), the ✨ AI menu gives you a two-step loop that works with <strong>whatever assistant you already use</strong> — no API key, no extra subscription:</p>
 <ol>
 <li><strong>Copy Brief for AI</strong> — puts a complete brief on your clipboard: your collections, variables, current values, and the full expression syntax. Paste it into ChatGPT, Claude, Gemini — then ask in plain words: <em>"derive a 10-step ramp from brand/seed, and make button text pick black or white by contrast."</em></li>
-<li><strong>Paste AI Result</strong> — paste the assistant's reply back. The plugin parses it and shows a <strong>preview of every proposed change</strong> — old value → new expression, per variable — and nothing touches your file until you apply.</li>
+<li><strong>Paste AI Result</strong> — paste the assistant's reply back. The plugin parses it and shows a <strong>preview of every proposed change</strong> — old value<svg class="arr" aria-hidden="true" viewBox="0 0 16 16"><path d="M2.5 8h10.4M8.8 3.9 12.9 8l-4.1 4.1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>new expression, per variable — and nothing touches your file until you apply.</li>
 </ol>
 <figure class="shot" role="img" aria-label="Screenshot: the editor's AI menu open, showing the Copy Brief for AI and Paste AI Result commands.">
 <span class="cam">📷</span>
@@ -165,7 +185,7 @@ figure.shot figcaption strong{color:var(--figma-color-text)}
 </figure>
 <figure class="shot" role="img" aria-label="Screenshot: the Paste AI Result preview dialog listing proposed changes — variable names with their old values and the new expressions — with apply and cancel buttons.">
 <span class="cam">📷</span>
-<figcaption><strong>Screenshot to capture:</strong> the Paste AI Result preview showing several proposed changes (old value → new expression) before applying. Full dialog; ~1200px wide.</figcaption>
+<figcaption><strong>Screenshot to capture:</strong> the Paste AI Result preview showing several proposed changes (old value<svg class="arr" aria-hidden="true" viewBox="0 0 16 16"><path d="M2.5 8h10.4M8.8 3.9 12.9 8l-4.1 4.1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>new expression) before applying. Full dialog; ~1200px wide.</figcaption>
 </figure>
 <div class="note"><strong>Models that do well:</strong> in our test harness (20 design-system scenarios), Claude Haiku 4.5, Codex and GPT-5-mini solve nearly everything; DeepSeek is a solid budget option. Small local models tend to produce invalid expressions — the preview will catch them, but you'll have a better time with the tier above.</div>
 
@@ -202,7 +222,7 @@ figure.shot figcaption strong{color:var(--figma-color-text)}
 <tr><td><code>cd</code></td><td><a href="https://github.com/omgovich/colord" target="_blank" rel="noopener">colord</a> — chainable color ops (Figma-color aware)</td><td><code>cd($brand).darken(0.1).toHex()</code></td></tr>
 <tr><td><code>cl</code></td><td><a href="https://culorijs.org/api/" target="_blank" rel="noopener">culori</a> — color science. <em>Functions, not methods</em>: <code>cl.oklch(c)</code>, <code>cl.formatHex(c)</code>, <code>cl.wcagLuminance(c)</code>; results are plain objects</td><td><code>cl.formatHex(cl.rgb({mode:'oklch',l:.7,c:.15,h:250}))</code></td></tr>
 <tr><td><code>cv</code></td><td><code>culori.converter()</code> — parse/convert any CSS color (or a Figma color object) to RGB</td><td><code>cl.clampRgb(cv("oklch(90% 0.4 135)"))</code></td></tr>
-<tr><td><code>rgba</code></td><td>Figma-style CSS color parser → <code>{r,g,b,a}</code></td><td><code>rgba("green")</code></td></tr>
+<tr><td><code>rgba</code></td><td>Figma-style CSS color parser<svg class="arr" aria-hidden="true" viewBox="0 0 16 16"><path d="M2.5 8h10.4M8.8 3.9 12.9 8l-4.1 4.1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><code>{r,g,b,a}</code></td><td><code>rgba("green")</code></td></tr>
 <tr><td><code>fn</code></td><td>Number/date formatting (Intl)</td><td><code>fn($price, "en-US", {style:"currency", currency:"USD"})</code></td></tr>
 <tr><td><code>cdRandom</code>, <code>cdGetFormat</code></td><td>colord extras</td><td><code>cdRandom().toHex()</code></td></tr>
 </table>
@@ -229,7 +249,7 @@ figure.shot figcaption strong{color:var(--figma-color-text)}
 <p><strong>Will the plugin change variables I didn't write expressions for?</strong><br>No. Only variables whose description contains <code>{{ }}</code> are touched — and AI-proposed changes always go through the preview first.</p>
 
 <h2 id="pro">Free &amp; Pro</h2>
-<p>Everything is free for up to <strong>5</strong> dynamic variables, forever. A full-featured trial (7 or 14 days depending on variant) has no cap. <a href="https://neelts.lemonsqueezy.com/buy/7753e037-3c90-404f-8cbb-508ba5bfc2eb" target="_blank" rel="noopener">Pro</a> removes the limit and funds development — activate via <em>Dynamic Variables → Pro License → Activate Key</em> (5 devices, 10 on Unlimited; write me for activation resets).</p>
+<p>Everything is free for up to <strong>5</strong> dynamic variables, forever. A full-featured trial (7 or 14 days depending on variant) has no cap. <a href="https://neelts.lemonsqueezy.com/buy/7753e037-3c90-404f-8cbb-508ba5bfc2eb" target="_blank" rel="noopener">Pro</a> removes the limit and funds development — activate via <em>Dynamic Variables<svg class="arr" aria-hidden="true" viewBox="0 0 16 16"><path d="M2.5 8h10.4M8.8 3.9 12.9 8l-4.1 4.1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Pro License<svg class="arr" aria-hidden="true" viewBox="0 0 16 16"><path d="M2.5 8h10.4M8.8 3.9 12.9 8l-4.1 4.1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Activate Key</em> (5 devices, 10 on Unlimited; write me for activation resets).</p>
 
 <footer>
 <p><a href="https://www.figma.com/community/plugin/1365339609215368041">Dynamic Variables on Figma Community</a> · <a href="https://github.com/neelts/figma-dynamic-variables-docs">These docs on GitHub</a> · <a href="https://neelts.lemonsqueezy.com">Subscribe for updates</a></p>
@@ -427,6 +447,80 @@ async function evaluateModel(model, root){
   render(model, root);
 }
 
+
+// ---------- code editing (Monaco, lazy; textarea fallback) ----------
+let monacoP = null;
+function loadMonaco(){
+  monacoP ??= new Promise((resolve, reject) => {
+    const base = "https://cdn.jsdelivr.net/npm/monaco-editor@0.55.1/min";
+    const sc = document.createElement("script");
+    sc.src = base + "/vs/loader.js";
+    sc.onload = () => {
+      window.require.config({ paths: { vs: base + "/vs" } });
+      window.require(["vs/editor/editor.main"], () => resolve(window.monaco), reject);
+    };
+    sc.onerror = reject;
+    document.head.appendChild(sc);
+  });
+  return monacoP;
+}
+let activeEditor = null; // { dispose() } for whichever editor is open
+function disposeActive(){ if (activeEditor){ try{ activeEditor.dispose(); }catch(e){} activeEditor = null; } }
+
+async function editCode(holder, initial, onCommit, onCancel){
+  disposeActive();
+  holder.innerHTML = `<div class="medit"><div class="mhost"></div><div class="mhint">Ctrl/⌘+Enter or click away to apply · Esc to cancel</div></div>`;
+  const host = holder.querySelector(".mhost");
+  let committed = false;
+  let getVal = () => initial;
+  const outside = ev => { if (!holder.contains(ev.target)) commit(getVal()); };
+  const cleanup = () => { document.removeEventListener("pointerdown", outside, true); disposeActive(); };
+  const commit = (val) => { if (committed) return; committed = true; cleanup(); onCommit(val); };
+  const cancel = () => { if (committed) return; committed = true; cleanup(); onCancel(); };
+  setTimeout(() => document.addEventListener("pointerdown", outside, true), 0);
+  try {
+    const monaco = await loadMonaco();
+    const lines = Math.max(1, initial.split("\n").length);
+    host.style.height = Math.min(300, lines * 19 + 16) + "px";
+    const ed = monaco.editor.create(host, {
+      value: initial,
+      language: "javascript",
+      theme: document.documentElement.className === "figma-dark" ? "vs-dark" : "vs",
+      minimap: { enabled: false }, lineNumbers: "off", folding: false,
+      scrollBeyondLastLine: false, wordWrap: "on", fontSize: 12,
+      renderLineHighlight: "none", overviewRulerLanes: 0, glyphMargin: false,
+      lineDecorationsWidth: 6, scrollbar: { vertical: "auto", horizontal: "hidden" },
+      automaticLayout: true, padding: { top: 8, bottom: 8 },
+    });
+    ed.onDidChangeModelContent(() => {
+      const l = Math.max(1, ed.getModel().getLineCount());
+      host.style.height = Math.min(300, l * 19 + 16) + "px";
+    });
+    getVal = () => ed.getValue();
+    ed.addCommand(window.monaco.KeyMod.CtrlCmd | window.monaco.KeyCode.Enter, () => commit(ed.getValue()));
+    ed.addCommand(window.monaco.KeyCode.Escape, cancel);
+    ed.onDidBlurEditorWidget(() => commit(ed.getValue()));
+    activeEditor = ed;
+    ed.focus();
+    const model = ed.getModel();
+    ed.setPosition({ lineNumber: model.getLineCount(), column: model.getLineMaxColumn(model.getLineCount()) });
+  } catch(e) {
+    // CDN unavailable — plain textarea with the same contract
+    host.outerHTML = `<textarea spellcheck="false"></textarea>`;
+    const ta = holder.querySelector("textarea");
+    getVal = () => ta.value;
+    ta.value = initial;
+    ta.rows = Math.max(2, initial.split("\n").length);
+    ta.addEventListener("keydown", ev => {
+      if ((ev.ctrlKey||ev.metaKey) && ev.key === "Enter") commit(ta.value);
+      if (ev.key === "Escape") cancel();
+    });
+    ta.addEventListener("blur", () => commit(ta.value));
+    activeEditor = { dispose(){} };
+    ta.focus();
+  }
+}
+
 // ---------- color picker popover (vanilla-colorful) ----------
 let openPop = null;
 function closePop(){ if (openPop){ openPop.remove(); openPop = null; } }
@@ -438,8 +532,10 @@ function openPicker(btn, hexVal, onChange){
   pop.innerHTML = `<hex-color-picker color="${hexVal}"></hex-color-picker><div class="hexrow"><input type="text" value="${hexVal}" spellcheck="false"></div>`;
   document.body.appendChild(pop);
   const r = btn.getBoundingClientRect();
+  const ph = pop.offsetHeight || 240;
+  const above = r.top > ph + 12; // prefer above so it never covers the derived swatches
   pop.style.left = Math.min(r.left + scrollX, scrollX + innerWidth - 240) + "px";
-  pop.style.top = (r.bottom + scrollY + 6) + "px";
+  pop.style.top = (above ? r.top + scrollY - ph - 6 : r.bottom + scrollY + 6) + "px";
   const picker = pop.querySelector("hex-color-picker");
   const input = pop.querySelector("input");
   picker.addEventListener("color-changed", e => { input.value = e.detail.value; onChange(e.detail.value); });
@@ -449,16 +545,22 @@ function openPicker(btn, hexVal, onChange){
 
 // ---------- rendering ----------
 function render(model, root){
+  disposeActive();
   let html = "";
+  const esc = t => t.replace(/&/g,"&amp;").replace(/</g,"&lt;");
   if (model.globalFunctions){
-    html += `<div class="gfbox"><p class="gfcap">Global Functions</p><pre><code>${model.globalFunctions.trim().replace(/&/g,"&amp;").replace(/</g,"&lt;")}</code></pre></div>`;
+    html += `<div class="gfbox"><p class="gfcap">Global Functions — click to edit</p>
+      <div class="exprview" data-gf="1" title="Click to edit"><code>${esc(model.globalFunctions.trim())}</code><span class="edithint">✎ edit</span></div></div>`;
   }
   for (const [cName, coll] of Object.entries(model.collections)){
     html += `<div class="colcap">${cName} <span class="dim">· modes: ${coll.modes.join(" / ")}</span></div>`;
     html += `<table><tr><th>Variable</th>${coll.modes.map(m=>`<th>${m}</th>`).join("")}</tr>`;
     for (const v of coll.vars){
       const st = state(v);
-      html += `<tr><td><span class="vname">${v.name}</span>${v.expr?`<span class="vexpr">{{ ${v.expr.replace(/&/g,"&amp;").replace(/</g,"&lt;")} }}</span>`:""}</td>`;
+      const nameCell = v.editableName
+        ? `<input class="nameinput" type="text" value="${esc(v.name)}" data-name-c="${cName}" data-name-v="${v.name}" title="Rename me — the expression reads its own name">`
+        : `<span class="vname">${v.name}</span>`;
+      html += `<tr><td>${nameCell}</td>`;
       for (const m of coll.modes){
         if (v.expr){
           html += `<td>${st.err[m]?`<span class="err" title="${st.err[m].replace(/"/g,"&quot;")}">⚠ ${st.err[m]}</span>`:displayVal(st.out[m], v.type)}</td>`;
@@ -475,6 +577,12 @@ function render(model, root){
         } else html += `<td>${displayVal(v.values[m], v.type)}</td>`;
       }
       html += `</tr>`;
+      if (v.expr){
+        html += `<tr class="exprrow"><td colspan="${coll.modes.length+1}">
+          <div class="exprview" data-ex-c="${cName}" data-ex-v="${v.name}" title="Click to edit">
+            <span class="brace">{{</span><code>${esc(v.expr)}</code><span class="brace">}}</span>
+            <span class="edithint">✎ edit</span></div></td></tr>`;
+      }
     }
     html += `</table>`;
   }
@@ -486,6 +594,30 @@ function render(model, root){
       v.values[inp.dataset.m] = inp.type==="number" ? parseFloat(inp.value||"0") : inp.value;
       reval();
     });
+  });
+  box.querySelectorAll(".nameinput").forEach(inp=>{
+    inp.addEventListener("change", ()=>{
+      const v = model.collections[inp.dataset.nameC].vars.find(x=>x.name===inp.dataset.nameV);
+      const nn = inp.value.trim();
+      if (nn) { v.name = nn; }
+      evaluateModel(model, root);
+    });
+  });
+  box.querySelectorAll("[data-ex-c]").forEach(view=>{
+    view.addEventListener("click", ()=>{
+      const v = model.collections[view.dataset.exC].vars.find(x=>x.name===view.dataset.exV);
+      const holder = view.parentElement;
+      editCode(holder, v.expr,
+        val => { v.expr = val.trim(); evaluateModel(model, root); },
+        () => render(model, root));
+    });
+  });
+  const gfView = box.querySelector("[data-gf]");
+  if (gfView) gfView.addEventListener("click", ()=>{
+    const holder = gfView.parentElement;
+    editCode(holder, model.globalFunctions.trim(),
+      val => { model.globalFunctions = val; evaluateModel(model, root); },
+      () => render(model, root));
   });
   box.querySelectorAll(".swbtn").forEach(btn=>{
     btn.addEventListener("click", ()=>{
@@ -515,9 +647,9 @@ function mount(root, ex){
 
 // ---------- the examples (all pinned against the real engine) ----------
 const RAMP_GF = `function rampStep(seed, name) {
-  const L = {100:.95, 200:.88, 400:.7, 600:.55, 800:.4}[Number(name.split('-')[1])];
+  const n = Number(name.split('-')[1]);   // 50..950, straight from the name
   const s = cl.oklch(cv(seed));
-  return cl.formatHex(cl.clampRgb(cl.rgb({mode:'oklch', l:L, c:s.c, h:s.h})));
+  return cl.formatHex(cl.clampRgb(cl.rgb({mode:'oklch', l: 0.97 - 0.85 * n / 1000, c: s.c, h: s.h})));
 }`;
 
 const EXAMPLES = {
@@ -539,7 +671,7 @@ first: {
   ]}}}},
 ramp: {
   title: "OKLCH ramp — the math lives in one Global Function",
-  hint: "Every step is the same one-line call; rampStep reads the step from the variable's own name. Change the seed.",
+  hint: "Fully algorithmic: lightness is computed from the step number in the name. Change the seed — and RENAME the last row (try ramp-950, ramp-50, ramp-137…): its color recomputes from its own name.",
   model: {
     globalFunctions: RAMP_GF,
     collections: { "Brand": { modes:["Value"], vars:[
@@ -548,6 +680,7 @@ ramp: {
       { name:"ramp-400", type:"COLOR", values:{}, expr:"rampStep($seed, '$$.name')" },
       { name:"ramp-600", type:"COLOR", values:{}, expr:"rampStep($seed, '$$.name')" },
       { name:"ramp-800", type:"COLOR", values:{}, expr:"rampStep($seed, '$$.name')" },
+      { name:"ramp-500", type:"COLOR", values:{}, editableName:true, expr:"rampStep($seed, '$$.name')" },
     ]}}}},
 spacing: {
   title: "Density-aware spacing via relative refs",

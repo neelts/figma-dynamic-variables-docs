@@ -151,14 +151,18 @@ and pinned as a test against the real engine in the plugin repository.
 
 The math lives in ONE Global Function; every step is a readable one-line call
 that passes its own name. Adding `ramp-300` later means adding a variable, not
-another copy of the formula:
+another copy of the formula.
+
+Fully algorithmic — lightness is computed from the step number in the name, so
+*any* `ramp-NNN` works, including steps invented long after the function was
+written:
 
 ```js
 // Global Functions collection
 function rampStep(seed, name) {
-  const L = {100:.95, 200:.88, 400:.7, 600:.55, 800:.4}[Number(name.split('-')[1])];
+  const n = Number(name.split('-')[1]);   // 50..950, straight from the name
   const s = cl.oklch(cv(seed));
-  return cl.formatHex(cl.clampRgb(cl.rgb({mode:'oklch', l:L, c:s.c, h:s.h})));
+  return cl.formatHex(cl.clampRgb(cl.rgb({mode:'oklch', l: 0.97 - 0.85 * n / 1000, c: s.c, h: s.h})));
 }
 ```
 
