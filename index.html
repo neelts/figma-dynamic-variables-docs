@@ -23,7 +23,8 @@
 <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.55.1/min/vs/loader.js"></script>
 <style>
 *{box-sizing:border-box}
-:root{--font-mono:"Roboto Mono","Monaco","Courier New",monospace}
+:root{--font-mono:"Roboto Mono","Monaco","Courier New",monospace;--editor-bg:#ffffff}
+.figma-dark{--editor-bg:#1e1e1e}
 body{margin:0;font:13px/1.6 "Inter",-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:450;
   background:var(--figma-color-bg);color:var(--figma-color-text);}
 main{max-width:860px;margin:0 auto;padding:24px 20px 120px;font-size:14px}
@@ -63,7 +64,9 @@ table.ref th{background:var(--figma-color-bg-secondary)}
 .headrow .vmain{min-width:0;display:flex;align-items:center;font-size:11px;font-weight:500;color:var(--figma-color-text-secondary);padding-left:28px}
 .sw{display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid var(--figma-color-border);flex:none}
 .err{color:var(--figma-color-text-danger);font-size:11px;font-family:var(--font-mono);white-space:normal}
-.editor-wrapper{padding:12px;border-bottom:1px solid var(--figma-color-border);background:var(--figma-color-bg)}
+/* the plugin paints the whole wrapper in MONACO's background (app.css
+   --editor-bg), so the editor reads as one full-width strip */
+.editor-wrapper{padding:12px;border-bottom:1px solid var(--figma-color-border);background:var(--editor-bg)}
 .editor-wrapper .mhost{width:100%;min-height:16px}
 .mcell input[type=text]{width:100%;background:var(--figma-color-bg);color:var(--figma-color-text);
   border:1px solid var(--figma-color-border);
