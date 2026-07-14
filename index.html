@@ -61,7 +61,7 @@ table.ref th{background:var(--figma-color-bg-secondary)}
 .mcell.header{font-weight:500;color:var(--figma-color-text-secondary);user-select:none;height:28px}
 .headrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:stretch;padding:0 8px;border-bottom:1px solid var(--figma-color-border);
   background:var(--figma-color-bg-secondary)}
-.headrow .vmain{min-width:0;display:flex;align-items:center;font-size:11px;font-weight:500;color:var(--figma-color-text-secondary);padding-left:28px}
+.headrow .vmain{min-width:0;display:flex;align-items:center;font-size:11px;font-weight:500;color:var(--figma-color-text-secondary)}
 .sw{display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid var(--figma-color-border);flex:none}
 .err{color:var(--figma-color-text-danger);font-size:11px;font-family:var(--font-mono);white-space:normal}
 /* the plugin paints the whole wrapper in MONACO's background (app.css
@@ -75,7 +75,13 @@ table.ref th{background:var(--figma-color-bg-secondary)}
 .mcell input[type=text]:focus{border-color:var(--figma-color-border-selected)}
 .mcell input.num{-moz-appearance:textfield;appearance:textfield}
 .mcell input.num::-webkit-outer-spin-button,.mcell input.num::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.nameinput{background:transparent;color:var(--figma-color-text);border:1px dashed var(--figma-color-border-strong,#888);
+.boolsw{position:relative;width:32px;height:18px;flex:none;border-radius:9px;border:1px solid var(--figma-color-border);
+  background:var(--figma-color-bg-tertiary);cursor:pointer;padding:0;transition:background .12s,border-color .12s}
+.boolsw .knob{position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;
+  background:var(--figma-color-icon-secondary,#999);transition:left .12s,background .12s}
+.boolsw.on{background:var(--figma-color-bg-brand);border-color:var(--figma-color-bg-brand)}
+.boolsw.on .knob{left:16px;background:#fff}
+.nameinput{background:transparent;color:var(--figma-color-text);border:1px solid var(--figma-color-border);
   border-radius:4px;padding:2px 6px;font:12px var(--font-mono);width:110px;outline:none}
 .nameinput:focus{border-style:solid;border-color:var(--figma-color-border-selected)}
 .swbtn{display:inline-flex;align-items:center;gap:6px;background:var(--figma-color-bg);
@@ -126,7 +132,7 @@ tr.exprrow td{padding:2px 8px 8px;border-bottom:1px solid var(--figma-color-bord
 .medit textarea{width:100%;border:none;outline:none;background:var(--figma-color-bg);color:var(--figma-color-text);
   font:12px/1.5 ui-monospace,Menlo,monospace;padding:8px 10px;resize:vertical;min-height:34px}
 .medit .mhint{font-size:10px;color:var(--figma-color-text-tertiary);padding:2px 10px 4px;border-top:1px solid var(--figma-color-border)}
-.nameinput{background:var(--figma-color-bg);color:var(--figma-color-text);border:1px dashed var(--figma-color-border-strong,#888);
+.nameinput{background:var(--figma-color-bg);color:var(--figma-color-text);border:1px solid var(--figma-color-border);
   border-radius:5px;padding:2px 6px;font:12px ui-monospace,Menlo,monospace;width:110px;outline:none}
 .nameinput:focus{border-style:solid;border-color:var(--figma-color-border-selected)}
 .gfbox .exprview code{font-size:11.5px}
@@ -621,6 +627,8 @@ function mount(root, ex){
           if (v.type==="COLOR"){
             const hx = typeof val==="string" ? (val.startsWith("#")?val:"#"+val).toLowerCase() : figToHex(val);
             html += `<div class="mcell"><button class="swbtn" data-pick='${JSON.stringify([v.id, m])}'><span class="sw" style="background:${hx}"></span><span class="truncate">${hexText(hx)}</span></button></div>`;
+          } else if (v.type==="BOOLEAN"){
+            html += `<div class="mcell"><button class="boolsw${v.values[m]?" on":""}" role="switch" aria-checked="${!!v.values[m]}" data-bool='${JSON.stringify([v.id, m])}'><span class="knob"></span></button><span class="truncate">${v.values[m]}</span></div>`;
           } else if (v.type==="FLOAT"){
             html += `<div class="mcell"><input type="text" inputmode="decimal" class="num" value="${val}" data-base='${JSON.stringify([v.id, m, "number"])}'></div>`;
           } else {
@@ -646,11 +654,30 @@ function mount(root, ex){
   if (ex.manual) root.querySelector(".run").addEventListener("click", ()=>evaluateModel(model, root));
 
   root.querySelectorAll("[data-base]").forEach(inp=>{
+    if (inp.classList.contains("num")) inp.addEventListener("keydown", ev=>{
+      if (ev.key !== "ArrowUp" && ev.key !== "ArrowDown") return;
+      ev.preventDefault();
+      const step = (ev.shiftKey ? 10 : 1) * (ev.key === "ArrowUp" ? 1 : -1);
+      const cur = parseFloat(inp.value || "0");
+      inp.value = String(Math.round((cur + step) * 1000) / 1000);
+      inp.dispatchEvent(new Event("input"));
+    });
     inp.addEventListener("input", ()=>{
       const [id, m, kind] = JSON.parse(inp.dataset.base);
       const v = findById(id);
       v.values[m] = kind==="number" ? parseFloat(inp.value||"0") : inp.value;
-      reval(300);
+      if (!ex.manual) reval(300);
+    });
+  });
+  root.querySelectorAll("[data-bool]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const [id, m] = JSON.parse(btn.dataset.bool);
+      const v = findById(id);
+      v.values[m] = !v.values[m];
+      btn.classList.toggle("on", v.values[m]);
+      btn.setAttribute("aria-checked", String(v.values[m]));
+      btn.nextElementSibling.textContent = String(v.values[m]);
+      if (!ex.manual) reval(150);
     });
   });
   root.querySelectorAll("[data-rename]").forEach(inp=>{
@@ -691,7 +718,7 @@ function mount(root, ex){
 // ---------- the examples: descriptions carry the full {{ }} wrapper,
 //            exactly as they live in a variable's description field ----------
 const RAMP_GF = `function rampStep(seed, name) {
-  const n = Number(name.split('-')[1]);   // 50..950, straight from the name
+  const n = parseInt(name.replace(/\\D/g, ''), 10);   // digits from the name: ramp-500, ramp500, 500
   const s = cl.oklch(cv(seed));
   return cl.formatHex(cl.clampRgb(cl.rgb({mode:'oklch', l: 0.97 - 0.85 * n / 1000, c: s.c, h: s.h})));
 }`;
@@ -770,21 +797,23 @@ dark: {
   }}},
 l10n: {
   title: "Copy that translates itself",
-  hint: "Switch the values — welcome and items-label recompose per language. Strings splice as raw text, so they're built inside string literals.",
+  hint: "Switch the values — welcome and items-label recompose per language. Strings splice as raw text (built inside literals); the unit word is picked from a translated array by bare numeric $$.modeIndex.",
   model: { collections: { "Strings": { modes:["EN","DE","FR"], vars:[
     { name:"greeting", type:"STRING", values:{ EN:"Hello", DE:"Hallo", FR:"Bonjour" } },
     { name:"user-name", type:"STRING", values:{ EN:"Neil", DE:"Neil", FR:"Neil" } },
     { name:"count", type:"FLOAT", values:{ EN:3, DE:3, FR:1 } },
     { name:"welcome", type:"STRING", values:{}, description:'{{ "$greeting, $user-name" + "!" }}' },
-    { name:"items-label", type:"STRING", values:{}, description:'{{ "$count " + ($count === 1 ? "item" : "items") }}' },
+    { name:"items-label", type:"STRING", values:{}, description:'{{ "$count " + ($count === 1 ? ["item","Artikel","article"][$$.modeIndex] : ["items","Artikel","articles"][$$.modeIndex]) }}' },
   ]}}}},
 weather: {
-  title: "Live: NYC feels-like temperature",
-  hint: "Fetch is allowed in expressions. Click Run — this calls Open-Meteo for real.",
+  title: "Live: feels-like temperature, any city",
+  hint: "Type a city, flip the °F switch, click Run — a geocoding fetch feeds a weather fetch, for real. Two variables drive one expression.",
   manual: true,
   model: { collections: { "Live": { modes:["Value"], vars:[
-    { name:"nyc-feels-like", type:"STRING", values:{ Value:"— click Run —" }, editable:false,
-      description:'{{ fetch("https://api.open-meteo.com/v1/forecast?latitude=40.71&longitude=-74.01&current=apparent_temperature&temperature_unit=fahrenheit").then(r => r.json()).then(d => Math.round(d.current.apparent_temperature) + "°F") }}' },
+    { name:"city", type:"STRING", values:{ Value:"New York" } },
+    { name:"use-fahrenheit", type:"BOOLEAN", values:{ Value:true } },
+    { name:"feels-like", type:"STRING", values:{ Value:"— click Run —" }, editable:false,
+      description:'{{ fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&name=" + encodeURIComponent("$city")).then(r => r.json()).then(g => fetch("https://api.open-meteo.com/v1/forecast?current=apparent_temperature" + "&latitude=" + g.results[0].latitude + "&longitude=" + g.results[0].longitude + "&temperature_unit=" + ($use-fahrenheit ? "fahrenheit" : "celsius")).then(r => r.json()).then(d => Math.round(d.current.apparent_temperature) + ($use-fahrenheit ? "°F" : "°C"))) }}' },
   ]}}}},
 };
 

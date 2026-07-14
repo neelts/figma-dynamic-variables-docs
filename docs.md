@@ -160,7 +160,7 @@ written:
 ```js
 // Global Functions collection
 function rampStep(seed, name) {
-  const n = Number(name.split('-')[1]);   // 50..950, straight from the name
+  const n = parseInt(name.replace(/\D/g, ''), 10);  // digits from the name: ramp-500, ramp500, 500
   const s = cl.oklch(cv(seed));
   return cl.formatHex(cl.clampRgb(cl.rgb({mode:'oklch', l: 0.97 - 0.85 * n / 1000, c: s.c, h: s.h})));
 }
@@ -220,17 +220,25 @@ greedy: `$user-name!` reads as a variable named `user-name!`):
 
 ```js
 welcome     → {{ "$greeting, $user-name" + "!" }}     // Hello, Neil! / Hallo, Neil! / Bonjour, Neil!
-items-label → {{ "$count " + ($count === 1 ? "item" : "items") }}
+items-label → {{ "$count " + ($count === 1 ? ["item","Artikel","article"][$$.modeIndex]
+                                             : ["items","Artikel","articles"][$$.modeIndex]) }}
 ```
 
 ### Live data — weather, prices, time
 
 Expressions can `fetch`; the plugin awaits the Promise:
 
+Two hand-set variables — a `city` STRING and a `use-fahrenheit` BOOLEAN —
+drive a geocoding fetch that feeds a weather fetch:
+
 ```js
-{{ fetch("https://api.open-meteo.com/v1/forecast?latitude=40.71&longitude=-74.01&current=apparent_temperature&temperature_unit=fahrenheit")
+{{ fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&name=" + encodeURIComponent("$city"))
      .then(r => r.json())
-     .then(d => Math.round(d.current.apparent_temperature) + "°F") }}
+     .then(g => fetch("https://api.open-meteo.com/v1/forecast?current=apparent_temperature"
+         + "&latitude=" + g.results[0].latitude + "&longitude=" + g.results[0].longitude
+         + "&temperature_unit=" + ($use-fahrenheit ? "fahrenheit" : "celsius"))
+       .then(r => r.json())
+       .then(d => Math.round(d.current.apparent_temperature) + ($use-fahrenheit ? "°F" : "°C"))) }}
 ```
 
 …or simply `{{ new Date().toLocaleTimeString("en-GB") }}`.
