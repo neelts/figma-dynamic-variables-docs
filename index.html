@@ -1,56 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="figma-light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dynamic Variables — Documentation</title>
 <meta name="description" content="Dynamic Variables for Figma: variables that derive themselves. Interactive documentation — every example runs live on this page.">
+<link rel="stylesheet" href="figma-tokens.css">
+<script>
+// Theme: Figma's own plugin tokens, class-switched (figma-tokens.css)
+(function(){
+  const mq = matchMedia("(prefers-color-scheme: dark)");
+  const apply = () => document.documentElement.className = mq.matches ? "figma-dark" : "figma-light";
+  mq.addEventListener("change", apply); apply();
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/culori@4.0.1/bundled/culori.umd.min.js"></script>
 <style>
-:root{
-  --bg:#ffffff;--fg:#1e1e1e;--fg-dim:#6b6b6b;--panel:#f5f5f5;--border:#e3e3e3;
-  --code-bg:#f0f0f2;--accent:#0d99ff;--ok:#14ae5c;--err:#f24822;--chip:#e8f4ff;
-}
-@media (prefers-color-scheme: dark){:root{
-  --bg:#1e1e1e;--fg:#eaeaea;--fg-dim:#9a9a9a;--panel:#2a2a2a;--border:#3a3a3a;
-  --code-bg:#2d2d31;--accent:#4cb3ff;--ok:#3ddc84;--err:#ff7961;--chip:#173a56;
-}}
 *{box-sizing:border-box}
-body{margin:0;font:15px/1.55 Inter,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--fg);}
-main{max-width:860px;margin:0 auto;padding:24px 20px 120px;}
-h1{font-size:32px;line-height:1.2;margin:32px 0 8px}
-h2{font-size:22px;margin:56px 0 8px;padding-top:8px;border-top:1px solid var(--border)}
-h3{font-size:17px;margin:28px 0 6px}
-p,li{color:var(--fg)} .dim{color:var(--fg-dim)}
-a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
-code,pre{font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--code-bg);border-radius:4px}
-code{padding:1px 5px} pre{padding:12px 14px;overflow-x:auto} pre code{padding:0;background:none}
-table.ref{border-collapse:collapse;width:100%;font-size:14px}
-table.ref td,table.ref th{border:1px solid var(--border);padding:6px 10px;text-align:left;vertical-align:top}
-.pill{display:inline-block;background:var(--chip);color:var(--accent);border-radius:10px;padding:1px 9px;font-size:12px;font-weight:600;vertical-align:2px}
+body{margin:0;font:13px/1.6 Inter,-apple-system,"Segoe UI",Roboto,sans-serif;
+  background:var(--figma-color-bg);color:var(--figma-color-text);}
+main{max-width:860px;margin:0 auto;padding:24px 20px 120px;font-size:14px}
+h1{font-size:30px;line-height:1.2;margin:28px 0 8px;letter-spacing:-.02em}
+h2{font-size:20px;margin:56px 0 8px;padding-top:12px;border-top:1px solid var(--figma-color-border);letter-spacing:-.01em}
+h3{font-size:16px;margin:28px 0 6px}
+p,li{color:var(--figma-color-text)}
+.dim{color:var(--figma-color-text-secondary)}
+a{color:var(--figma-color-text-brand);text-decoration:none} a:hover{text-decoration:underline}
+code,pre{font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  background:var(--figma-color-bg-secondary);border-radius:4px}
+code{padding:1px 5px} pre{padding:12px 14px;overflow-x:auto;border:1px solid var(--figma-color-border)} pre code{padding:0;background:none;border:none}
+table.ref{border-collapse:collapse;width:100%;font-size:13px}
+table.ref td,table.ref th{border:1px solid var(--figma-color-border);padding:6px 10px;text-align:left;vertical-align:top}
+table.ref th{background:var(--figma-color-bg-secondary)}
+.pill{display:inline-block;background:var(--figma-color-bg-brand-tertiary);color:var(--figma-color-text-brand);
+  border-radius:10px;padding:1px 9px;font-size:11px;font-weight:600;vertical-align:2px}
 /* playground */
-.play{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 14px 10px;margin:18px 0}
-.play h4{margin:0 0 2px;font-size:14px}
-.play .hint{font-size:12.5px;color:var(--fg-dim);margin:0 0 10px}
-.play table{border-collapse:collapse;width:100%;font-size:13px}
-.play th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--fg-dim);text-align:left;padding:4px 8px;border-bottom:1px solid var(--border)}
-.play td{padding:4px 8px;border-bottom:1px solid var(--border);vertical-align:middle}
+.play{background:var(--figma-color-bg-secondary);border:1px solid var(--figma-color-border);border-radius:13px;padding:14px 14px 10px;margin:18px 0}
+.play h4{margin:0 0 2px;font-size:13px;font-weight:600}
+.play .hint{font-size:12px;color:var(--figma-color-text-secondary);margin:0 0 10px}
+.play table{border-collapse:collapse;width:100%;font-size:12.5px}
+.play th{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--figma-color-text-tertiary);
+  text-align:left;padding:4px 8px;border-bottom:1px solid var(--figma-color-border)}
+.play td{padding:4px 8px;border-bottom:1px solid var(--figma-color-border);vertical-align:middle}
 .play tr:last-child td{border-bottom:none}
-.vname{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;white-space:nowrap}
-.vexpr{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--fg-dim);display:block;margin-top:2px;white-space:pre-wrap;word-break:break-word}
-.sw{display:inline-block;width:14px;height:14px;border-radius:4px;border:1px solid rgba(128,128,128,.45);vertical-align:-2px;margin-right:6px}
-.val{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;white-space:nowrap}
-.err{color:var(--err);font-size:12px;font-family:ui-monospace,Menlo,monospace;white-space:normal}
-.play input[type=text],.play input[type=number]{width:86px;background:var(--bg);color:var(--fg);border:1px solid var(--border);border-radius:5px;padding:3px 6px;font:12.5px ui-monospace,Menlo,monospace}
-.play input[type=color]{width:22px;height:22px;padding:0;border:none;background:none;vertical-align:middle;cursor:pointer}
-.play .colcap{font-size:12px;font-weight:600;margin:10px 0 4px}
-.badge-derived{color:var(--ok);font-size:10px;font-weight:700;letter-spacing:.05em}
-button.run{background:var(--accent);border:none;color:#fff;border-radius:6px;padding:5px 14px;font-size:13px;font-weight:600;cursor:pointer;margin:8px 0 4px}
-button.reset{background:none;border:1px solid var(--border);color:var(--fg-dim);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;float:right}
-.note{border-left:3px solid var(--accent);padding:8px 14px;background:var(--panel);border-radius:0 8px 8px 0;font-size:14px;margin:14px 0}
-nav.toc{font-size:14px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px 18px;margin:22px 0}
+.vname{font-family:ui-monospace,Menlo,monospace;font-size:12px;white-space:nowrap}
+.vexpr{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--figma-color-text-secondary);
+  display:block;margin-top:2px;white-space:pre-wrap;word-break:break-word}
+.gfbox{margin:8px 0 2px}
+.gfbox .gfcap{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--figma-color-text-tertiary);margin:0 0 3px}
+.gfbox pre{margin:0;background:var(--figma-color-bg);border-radius:8px}
+.sw{display:inline-block;width:14px;height:14px;border-radius:4px;border:1px solid var(--figma-color-border-strong,rgba(128,128,128,.4));vertical-align:-2px;margin-right:6px}
+.val{font-family:ui-monospace,Menlo,monospace;font-size:12px;white-space:nowrap}
+.err{color:var(--figma-color-text-danger);font-size:11.5px;font-family:ui-monospace,Menlo,monospace;white-space:normal}
+.play input[type=text],.play input[type=number]{width:90px;background:var(--figma-color-bg);color:var(--figma-color-text);
+  border:1px solid var(--figma-color-border);border-radius:5px;padding:3px 6px;font:12px ui-monospace,Menlo,monospace;outline:none}
+.play input[type=text]:focus,.play input[type=number]:focus{border-color:var(--figma-color-border-selected)}
+.play input[type=text].wide{width:130px}
+.play .colcap{font-size:11.5px;font-weight:600;margin:10px 0 4px}
+button.run{background:var(--figma-color-bg-brand);border:none;color:var(--figma-color-text-onbrand);
+  border-radius:6px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;margin:8px 0 4px}
+button.run:hover{background:var(--figma-color-bg-brand-hover)}
+button.reset{background:none;border:1px solid var(--figma-color-border);color:var(--figma-color-text-secondary);
+  border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;float:right}
+button.reset:hover{border-color:var(--figma-color-border-strong)}
+.note{border-left:3px solid var(--figma-color-border-brand-strong);padding:8px 14px;background:var(--figma-color-bg-secondary);
+  border-radius:0 8px 8px 0;font-size:13px;margin:14px 0}
+nav.toc{font-size:13px;background:var(--figma-color-bg-secondary);border:1px solid var(--figma-color-border);border-radius:13px;padding:12px 18px;margin:22px 0}
 nav.toc a{display:inline-block;margin:2px 12px 2px 0}
-footer{margin-top:70px;border-top:1px solid var(--border);padding-top:16px;font-size:13px;color:var(--fg-dim)}
+footer{margin-top:70px;border-top:1px solid var(--figma-color-border);padding-top:16px;font-size:12.5px;color:var(--figma-color-text-secondary)}
+/* color picker (vanilla-colorful) */
+.swbtn{display:inline-flex;align-items:center;gap:6px;background:var(--figma-color-bg);border:1px solid var(--figma-color-border);
+  border-radius:5px;padding:2px 8px 2px 3px;cursor:pointer;font:12px ui-monospace,Menlo,monospace;color:var(--figma-color-text)}
+.swbtn:hover{border-color:var(--figma-color-border-strong)}
+.swbtn .sw{margin:0}
+.pickpop{position:absolute;z-index:40;background:var(--figma-color-bg);border:1px solid var(--figma-color-border);
+  border-radius:13px;box-shadow:0 5px 24px rgba(0,0,0,.25);padding:10px}
+.pickpop hex-color-picker{width:200px;height:160px}
+.pickpop .hexrow{display:flex;gap:6px;margin-top:8px}
+.pickpop input{flex:1;background:var(--figma-color-bg);color:var(--figma-color-text);border:1px solid var(--figma-color-border);
+  border-radius:5px;padding:3px 6px;font:12px ui-monospace,Menlo,monospace;outline:none}
+hex-color-picker::part(saturation){border-radius:8px 8px 0 0}
+hex-color-picker::part(hue){border-radius:0 0 8px 8px}
+/* screenshot placeholders */
+figure.shot{margin:16px 0;border:1.5px dashed var(--figma-color-border-strong,#888);border-radius:13px;
+  padding:26px 18px;text-align:center;background:var(--figma-color-bg-secondary)}
+figure.shot .cam{font-size:20px;display:block;margin-bottom:6px}
+figure.shot figcaption{font-size:12px;color:var(--figma-color-text-secondary);max-width:520px;margin:0 auto}
+figure.shot figcaption strong{color:var(--figma-color-text)}
 </style>
 </head>
 <body>
@@ -67,7 +103,7 @@ footer{margin-top:70px;border-top:1px solid var(--border);padding-top:16px;font-
 <h2 id="try">Try it — right here <span class="pill">live</span></h2>
 <p>These tables are <em>editable</em>. Change the base color and watch the derived shades recompute — exactly what the plugin does to your real Figma variables on every update.</p>
 <div class="play" data-example="hello"></div>
-<p class="dim">Every example on this page runs in your browser through a small sandbox that mimics the plugin's expression semantics (same syntax, same <code>cd</code>/<code>cl</code> libraries). The real plugin adds monitoring, rename-proof references, a visual editor and AI assistance on top.</p>
+<p class="dim">Every example on this page runs in your browser through a small sandbox that mimics the plugin's expression semantics (same syntax, same <code>cd</code>/<code>cl</code> libraries, colors handled as real Figma <code>{r,g,b,a}</code> objects). The real plugin adds monitoring, rename-proof references, a visual editor and AI assistance on top — and every example here is pinned as a test against the real engine in the plugin repository.</p>
 
 <h2 id="start">Start here — your first dynamic variable</h2>
 <ol>
@@ -75,14 +111,22 @@ footer{margin-top:70px;border-top:1px solid var(--border);padding-top:16px;font-
 <li><strong>Run the plugin.</strong> <em>Plugins → Dynamic Variables → Update Once</em> (one shot) or <em>Start Monitoring Changes</em> (updates live as you edit; pause/resume and interval are in the menu).</li>
 <li><strong>That's it.</strong> The variable's value is now computed. Edit <code>base-spacing</code> and it follows. Rename a referenced variable — references fix themselves.</li>
 </ol>
+<figure class="shot" role="img" aria-label="Screenshot: Figma's variables panel with a variable selected; its description field contains the expression double-curly-brace $base-spacing times 2, and the value column shows the computed result.">
+<span class="cam">📷</span>
+<figcaption><strong>Screenshot to capture:</strong> the variables panel, one variable selected, description field showing <code>{{ $base-spacing * 2 }}</code>, value column showing the computed result. Crop to the panel; ~1200px wide.</figcaption>
+</figure>
 <div class="play" data-example="first"></div>
 <p>Prefer a real editor over description fields? Open <em>Plugins → Dynamic Variables → Open Dynamic Variables Editor</em>: a tree of your collections with a full code editor (syntax highlighting, inline errors) — and the AI menu.</p>
+<figure class="shot" role="img" aria-label="Screenshot: the Dynamic Variables Editor window — collections tree on the left, code editor on the right with a highlighted expression and an inline error message under one line.">
+<span class="cam">📷</span>
+<figcaption><strong>Screenshot to capture:</strong> the Dynamic Variables Editor — collections tree (left), code editor (right) with an expression open and one inline error visible. Full window; ~1600px wide.</figcaption>
+</figure>
 
 <h2 id="recipes">Recipes</h2>
-<p class="dim">Each recipe is live — poke the base values. These exact expressions are also pinned as tests against the real engine, so they can't drift out of date.</p>
+<p class="dim">Each recipe is live — poke the base values. These exact expressions are pinned as tests against the real engine, so they can't drift out of date.</p>
 
-<h3>1. Color ramp from one seed</h3>
-<p>A brand ramp where every shade derives from <code>seed</code>. OKLCH keeps hue and chroma perceptually steady while lightness walks the scale — and each step reads its own lightness from its <em>name</em>, so one identical expression serves the whole family.</p>
+<h3>1. Color ramp from one seed — with a Global Function</h3>
+<p>A brand ramp where every shade derives from <code>seed</code>. The OKLCH math lives in <strong>one Global Function</strong>; every step is a one-line call that passes its own name — readable, and adding <code>ramp-300</code> later means adding a variable, not another copy of the formula. (Global Functions live in their own collection in the plugin — define once, call anywhere.)</p>
 <div class="play" data-example="ramp"></div>
 
 <h3>2. Spacing scale with density modes</h3>
@@ -101,16 +145,28 @@ footer{margin-top:70px;border-top:1px solid var(--border);padding-top:16px;font-
 <p>Author the Light palette; Dark computes itself by inverting OKLCH lightness and damping chroma. One expression, both modes — <code>$$.mode</code> tells it where it's running (note the quotes: <code>'$$.mode'</code>).</p>
 <div class="play" data-example="dark"></div>
 
-<h3>6. Live data — the weather in New York</h3>
+<h3>6. Localization — languages as modes</h3>
+<p>Modes don't have to be Light/Dark — make them <strong>EN / DE / FR</strong> and compose copy that translates itself. String variables substitute as raw text, so build sentences <em>inside</em> a string literal: <code>"$greeting, $user-name"</code>. One quirk worth knowing: punctuation glued to a reference gets read as part of the name (<code>$user-name!</code> ≠ <code>$user-name</code>) — keep it outside, <code>+ "!"</code>.</p>
+<div class="play" data-example="l10n"></div>
+
+<h3>7. Live data — the weather in New York</h3>
 <p>Expressions can <code>fetch</code>. This pulls the current feels-like temperature in NYC from Open-Meteo (no API key) into a variable:</p>
 <div class="play" data-example="weather"></div>
 
 <h2 id="ai">AI editing — describe it, don't code it <span class="pill">2.0</span></h2>
 <p>You don't have to write these formulas yourself. In the editor (<em>Open Dynamic Variables Editor</em>), the ✨ AI menu gives you a two-step loop that works with <strong>whatever assistant you already use</strong> — no API key, no extra subscription:</p>
 <ol>
-<li><strong>Copy Brief for AI</strong> — puts a complete brief on your clipboard: your collections, variables, current values, and the full expression syntax. Paste it into ChatGPT, Claude, Gemini, anything — then ask in plain words: <em>"derive a 10-step ramp from brand/seed, and make button text pick black or white by contrast."</em></li>
+<li><strong>Copy Brief for AI</strong> — puts a complete brief on your clipboard: your collections, variables, current values, and the full expression syntax. Paste it into ChatGPT, Claude, Gemini — then ask in plain words: <em>"derive a 10-step ramp from brand/seed, and make button text pick black or white by contrast."</em></li>
 <li><strong>Paste AI Result</strong> — paste the assistant's reply back. The plugin parses it and shows a <strong>preview of every proposed change</strong> — old value → new expression, per variable — and nothing touches your file until you apply.</li>
 </ol>
+<figure class="shot" role="img" aria-label="Screenshot: the editor's AI menu open, showing the Copy Brief for AI and Paste AI Result commands.">
+<span class="cam">📷</span>
+<figcaption><strong>Screenshot to capture:</strong> the ✨ AI menu open in the editor, both commands visible. Crop to the menu with a little context; ~800px wide.</figcaption>
+</figure>
+<figure class="shot" role="img" aria-label="Screenshot: the Paste AI Result preview dialog listing proposed changes — variable names with their old values and the new expressions — with apply and cancel buttons.">
+<span class="cam">📷</span>
+<figcaption><strong>Screenshot to capture:</strong> the Paste AI Result preview showing several proposed changes (old value → new expression) before applying. Full dialog; ~1200px wide.</figcaption>
+</figure>
 <div class="note"><strong>Models that do well:</strong> in our test harness (20 design-system scenarios), Claude Haiku 4.5, Codex and GPT-5-mini solve nearly everything; DeepSeek is a solid budget option. Small local models tend to produce invalid expressions — the preview will catch them, but you'll have a better time with the tier above.</div>
 
 <h2 id="reference">Reference</h2>
@@ -132,32 +188,34 @@ footer{margin-top:70px;border-top:1px solid var(--border);padding-top:16px;font-
 
 <h3>Engine rules worth knowing</h3>
 <ul>
-<li><strong>Multi-statement expressions:</strong> the value is the <em>last statement</em> — <code>{{ const t = $a * 2; Math.round(t) }}</code>. A top-level <code>return</code> is a syntax error (use an IIFE if you want one).</li>
+<li><strong>Multi-statement expressions:</strong> the value is the <em>last statement</em> — <code>{{ const t = …; Math.round(t) }}</code>. A top-level <code>return</code> is a syntax error (use an IIFE if you want one).</li>
 <li><strong>Computed reference paths</strong> resolve <em>before</em> the body runs: build them from literals and <code>$$</code> text only — <code>$('ramp/' + '$$.name'.split('-')[1])</code> ✓; never from a <code>const</code> you declared in the same expression.</li>
+<li><strong>String values splice as raw text</strong> — use them inside string literals (<code>"$greeting, $user-name" + "!"</code>), and keep punctuation out of the reference (the name matcher is greedy).</li>
 <li><strong>Async is fine:</strong> if the expression's value is a Promise (e.g. a <code>fetch</code> chain), the plugin awaits it.</li>
 <li><strong>Colors</strong> can be returned as hex strings, <code>rgb()</code>/<code>hsl()</code> strings, colord instances, or Figma <code>{r,g,b,a}</code> objects — the plugin coerces. Bare CSS names need a parser: <code>rgba("green")</code> or <code>cd("green")</code>.</li>
+<li><strong>Disable one expression</strong> without deleting it: comment the braces — <code>//{{ … }}</code>.</li>
 </ul>
 
 <h3>Libraries in scope</h3>
 <table class="ref">
 <tr><th>Shorthand</th><th>What</th><th>Example</th></tr>
-<tr><td><code>cd</code></td><td><a href="https://github.com/omgovich/colord" target="_blank" rel="noopener">colord</a> — chainable color ops</td><td><code>cd($brand).darken(0.1).toHex()</code></td></tr>
+<tr><td><code>cd</code></td><td><a href="https://github.com/omgovich/colord" target="_blank" rel="noopener">colord</a> — chainable color ops (Figma-color aware)</td><td><code>cd($brand).darken(0.1).toHex()</code></td></tr>
 <tr><td><code>cl</code></td><td><a href="https://culorijs.org/api/" target="_blank" rel="noopener">culori</a> — color science. <em>Functions, not methods</em>: <code>cl.oklch(c)</code>, <code>cl.formatHex(c)</code>, <code>cl.wcagLuminance(c)</code>; results are plain objects</td><td><code>cl.formatHex(cl.rgb({mode:'oklch',l:.7,c:.15,h:250}))</code></td></tr>
-<tr><td><code>cv</code></td><td><code>culori.converter()</code> — parse/convert any CSS color to RGB</td><td><code>cl.clampRgb(cv("oklch(90% 0.4 135)"))</code></td></tr>
+<tr><td><code>cv</code></td><td><code>culori.converter()</code> — parse/convert any CSS color (or a Figma color object) to RGB</td><td><code>cl.clampRgb(cv("oklch(90% 0.4 135)"))</code></td></tr>
 <tr><td><code>rgba</code></td><td>Figma-style CSS color parser → <code>{r,g,b,a}</code></td><td><code>rgba("green")</code></td></tr>
 <tr><td><code>fn</code></td><td>Number/date formatting (Intl)</td><td><code>fn($price, "en-US", {style:"currency", currency:"USD"})</code></td></tr>
 <tr><td><code>cdRandom</code>, <code>cdGetFormat</code></td><td>colord extras</td><td><code>cdRandom().toHex()</code></td></tr>
 </table>
 
 <h3>Global Functions</h3>
-<p>Repeated logic across many expressions? Create a <strong>Global Functions</strong> collection in the editor and define plain JavaScript helpers once — <code>function onColor(bg) { … }</code> — then call them from any expression: <code>{{ onColor($('Brand/Primary')) }}</code>. Two things to remember: helper code is plain JS (no <code>$</code> references inside it — pass values in as arguments), and the <code>cd</code>/<code>cl</code> libraries are available inside helpers.</p>
+<p>Repeated logic across many expressions? Create a <strong>Global Functions</strong> collection in the editor and define plain JavaScript helpers once — like <code>rampStep()</code> in the ramp recipe above — then call them from any expression: <code>{{ rampStep($seed, '$$.name') }}</code>. Two things to remember: helper code is plain JS (no <code>$</code> references inside it — pass values in as arguments), and the <code>cd</code>/<code>cl</code> libraries are available inside helpers.</p>
 
 <h3>Run modes, errors, housekeeping</h3>
 <ul>
 <li><strong>Start Monitoring Changes</strong> — re-evaluates on your interval (configurable), pause/resume from the menu. <strong>Update Once</strong> — single pass, full control.</li>
 <li><strong>Errors are per-variable, per-mode</strong>: cyclic dependencies, unresolved references and type mismatches are reported with the variable name — in the editor they appear inline.</li>
-<li><strong>Disable one expression</strong> without deleting it: comment the braces — <code>//{{ … }}</code>.</li>
 <li><strong>Renames are safe</strong>: the plugin tracks references and rewrites them when variables are renamed or moved.</li>
+<li><strong>Library variables</strong>: bring team-library variables in as aliases and use them in expressions.</li>
 </ul>
 
 <h2 id="faq">FAQ</h2>
@@ -181,38 +239,62 @@ footer{margin-top:70px;border-top:1px solid var(--border);padding-top:16px;font-
 
 <script type="module">
 /* ── Docs sandbox: a small reimplementation of the expression semantics.
-      Same syntax, same libraries; the real engine does much more. ── */
-import { colord as cd, extend, random as cdRandom, getFormat as cdGetFormat } from "https://unpkg.com/colord@2.9.3/index.mjs";
+      Same syntax, same libraries, colors as Figma {r,g,b,a} objects;
+      the real engine does much more. ── */
+import { colord, extend, random as cdRandom, getFormat as cdGetFormat, Colord } from "https://unpkg.com/colord@2.9.3/index.mjs";
 import mixPlugin from "https://unpkg.com/colord@2.9.3/plugins/mix.mjs";
 import a11yPlugin from "https://unpkg.com/colord@2.9.3/plugins/a11y.mjs";
 import lchPlugin from "https://unpkg.com/colord@2.9.3/plugins/lch.mjs";
 import namesPlugin from "https://unpkg.com/colord@2.9.3/plugins/names.mjs";
-extend([mixPlugin, a11yPlugin, lchPlugin, namesPlugin]);
+import labPlugin from "https://unpkg.com/colord@2.9.3/plugins/lab.mjs";
+import hwbPlugin from "https://unpkg.com/colord@2.9.3/plugins/hwb.mjs";
+import "https://unpkg.com/vanilla-colorful@0.7.2/hex-color-picker.js?module";
+extend([mixPlugin, a11yPlugin, lchPlugin, namesPlugin, labPlugin, hwbPlugin]);
+
 const cl = window.culori, cv = window.culori.converter();
 const rgba = (s)=>{ const c = cl.rgb(typeof s==="string"?cl.parse(s):s); return c?{r:c.r,g:c.g,b:c.b,a:c.alpha==null?1:c.alpha}:null; };
 const fnFmt = (n,loc,opt)=> new Intl.NumberFormat(loc||undefined,opt||undefined).format(n);
 
-// ---------- data helpers ----------
-const isColorVal = v => typeof v==="string" && cl.parse(v);
-function toHexStr(v){ // how the engine hands colors to expressions: hex string
-  if (v && typeof v==="object" && "r" in v) { const c={mode:"rgb",r:v.r,g:v.g,b:v.b,alpha:v.a==null?1:v.a}; return cl.formatHex8 && c.alpha<1 ? cl.formatHex8(c) : cl.formatHex(c); }
+// Figma color detection + colord wrapper (mirrors the plugin's dvColord:
+// Figma channels are 0..1, colord expects 0..255)
+const isFig = v => v && typeof v==="object" && !("mode" in v) && ["r","g","b"].every(k=>typeof v[k]==="number" && v[k]>=0 && v[k]<=1);
+const figToColord = v => colord({ r:v.r*255, g:v.g*255, b:v.b*255, a:v.a==null?1:v.a });
+function cd(input){
+  const conv = x => isFig(x) ? figToColord(x) : colord(x);
+  const c = conv(input);
+  for (const m of ["mix","contrast","delta","isEqual","isReadable"]){
+    const orig = Colord.prototype[m];
+    if (orig) c[m] = (col, ...rest) => orig.call(c, col instanceof Colord ? col : conv(col), ...rest);
+  }
+  return c;
+}
+const hexToFig = h => { const c = cl.rgb(cl.parse(h)); return { r:c.r, g:c.g, b:c.b, a:c.alpha==null?1:c.alpha }; };
+const figToHex = v => cl.formatHex({ mode:"rgb", r:v.r, g:v.g, b:v.b });
+
+function coerceColor(v){ // what the engine's write-back does, roughly
+  try{
+    if (v==null) return v;
+    if (isFig(v)) return v;
+    if (v instanceof Colord) return hexToFig(v.toHex());
+    if (typeof v==="object" && "mode" in v){ const c = cl.rgb(v); return { r:c.r, g:c.g, b:c.b, a:c.alpha==null?1:c.alpha }; }
+    if (typeof v==="string" && cl.parse(v)) return hexToFig(v);
+  }catch(e){}
   return v;
 }
-function displayColor(v){
-  try{
-    if (v==null) return null;
-    if (typeof v==="object" && typeof v.toHex==="function") return v.toHex();       // colord instance
-    if (typeof v==="object" && "mode" in v) return cl.formatHex(v);                  // culori object
-    if (typeof v==="object" && "r" in v){ return toHexStr(v); }                      // figma rgba
-    if (typeof v==="string" && cl.parse(v)) return cl.formatHex(cl.rgb(cl.parse(v)));
-  }catch(e){}
-  return null;
+function displayVal(v, type){
+  if (v===undefined||v===null) return "—";
+  if (type==="COLOR" && isFig(v)){ const h = figToHex(v); return `<span class="sw" style="background:${h}"></span><span class="val">${h}</span>`; }
+  if (typeof v==="number") return `<span class="val">${Math.round(v*1000)/1000}</span>`;
+  return `<span class="val">${String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;")}</span>`;
 }
 
 // ---------- resolution (mirrors the engine's lookup order) ----------
+const stateMap = new WeakMap();
+function state(v){ let s = stateMap.get(v); if(!s){ s={out:{},err:{}}; stateMap.set(v,s);} return s; }
+
 function makeResolver(model, collName, curVar, modeName){
   const colls = model.collections;
-  function findIn(coll, name){ return coll.vars.find(v=>v.name===name); }
+  const findIn = (coll,name) => coll.vars.find(v=>v.name===name);
   function relResolve(path){
     const dir = curVar.name.split("/").slice(0,-1);
     for (const part of path.split("/")){
@@ -223,57 +305,52 @@ function makeResolver(model, collName, curVar, modeName){
   function lookup(path){
     let coll = colls[collName], name = path, cName = collName;
     if (path.startsWith("./")||path.startsWith("../")) name = relResolve(path);
-    else {
-      if (findIn(coll, path)) name = path;
-      else if (path.includes("/")){
-        const seg = path.split("/");
-        if (colls[seg[0]]){ cName = seg[0]; coll = colls[cName]; name = seg.slice(1).join("/"); }
-      }
+    else if (!findIn(coll, path) && path.includes("/")){
+      const seg = path.split("/");
+      if (colls[seg[0]]){ cName = seg[0]; coll = colls[cName]; name = seg.slice(1).join("/"); }
     }
     const v = findIn(coll, name);
     if (!v) throw new Error(`$('${path}') does not exist`);
-    const modes = coll.modes; const m = modes.includes(modeName)?modeName:modes[0];
-    const val = state(v).out[m] !== undefined ? state(v).out[m] : v.values[m];
-    if (val===undefined) throw new Error(`$('${path}') has no value for mode ${m}`);
+    const m = coll.modes.includes(modeName) ? modeName : coll.modes[0];
+    const st = state(v);
+    const raw = st.out[m] !== undefined ? st.out[m] : v.values[m];
+    if (raw===undefined) throw new Error(`$('${path}') has no value for mode ${m}`);
+    const val = v.type==="COLOR" && typeof raw==="string" ? hexToFig(raw) : raw;
     return { v, val, coll, cName, mode:m };
   }
   function meta(path, prop, self){
-    if (self) {
-      const coll = colls[collName];
-      const map = { name:curVar.name, id:"VariableID:demo", type:curVar.type, alias:"", collection:collName,
-        collectionId:"CollectionID:demo", mode:modeName, modeIndex: coll.modes.indexOf(modeName),
-        modeId:"ModeID:"+modeName, modes: JSON.stringify(coll.modes),
-        values: JSON.stringify(coll.modes.map(m=>state(curVar).out[m]??curVar.values[m])) };
-      if (!(prop in map)) throw new Error(`unknown $$ prop .${prop}`);
-      return String(map[prop]);
-    }
-    const r = lookup(path);
-    const map = { name:r.v.name, id:"VariableID:demo", type:r.v.type, alias:"", collection:r.cName,
-      collectionId:"CollectionID:demo", mode:r.mode, modeIndex:r.coll.modes.indexOf(r.mode),
-      modeId:"ModeID:"+r.mode, modes: JSON.stringify(r.coll.modes),
-      values: JSON.stringify(r.coll.modes.map(m=>state(r.v).out[m]??r.v.values[m])) };
+    const [v, coll, cName, m] = self
+      ? [curVar, colls[collName], collName, modeName]
+      : (r => [r.v, r.coll, r.cName, r.mode])(lookup(path));
+    const vals = coll.modes.map(mm=>{
+      const st = state(v); const raw = st.out[mm] !== undefined ? st.out[mm] : v.values[mm];
+      return v.type==="COLOR" && typeof raw==="string" ? hexToFig(raw) : raw;
+    });
+    const map = { name:v.name, id:"VariableID:demo", type:v.type, alias:"", collection:cName,
+      collectionId:"CollectionID:demo", mode:m, modeIndex: coll.modes.indexOf(m),
+      modeId:"ModeID:"+m, modes: JSON.stringify(coll.modes), values: JSON.stringify(vals) };
     if (!(prop in map)) throw new Error(`unknown $$ prop .${prop}`);
     return String(map[prop]);
   }
   return { lookup, meta };
 }
 
-// substitute value as source text (colors → hex string literals, like the engine)
+// engine-true substitution text: colors → ({r,g,b,a}), strings → RAW text,
+// numbers/booleans → plain
 function valToSource(val){
   if (typeof val==="number" || typeof val==="boolean") return String(val);
-  if (val && typeof val==="object" && "r" in val) return JSON.stringify(toHexStr(val));
+  if (isFig(val)) return `(${JSON.stringify(val)})`;
+  if (typeof val==="string") return val; // raw splice, like the engine
   return JSON.stringify(val);
 }
 
 function substitute(expr, res){
-  let out = "";
-  let i = 0;
+  let out = "", i = 0;
   while (i < expr.length){
     const ch = expr[i];
     if (ch !== "$"){ out += ch; i++; continue; }
     const dbl = expr[i+1] === "$";
     let j = i + (dbl?2:1);
-    // call form: $('path') / $$('path.prop')
     if (expr[j] === "("){
       const q = expr[j+1];
       if (q==="'"||q==='"'){
@@ -284,14 +361,11 @@ function substitute(expr, res){
           if (dbl){
             const dot = inner.lastIndexOf(".");
             out += res.meta(dot>0?inner.slice(0,dot):inner, dot>0?inner.slice(dot+1):"name", false);
-          } else {
-            // dynamic path? only literal supported here; engine also allows computed — sandbox: whole $( ... ) with concatenation:
-            out += valToSource(res.lookup(inner).val);
-          }
+          } else out += valToSource(res.lookup(inner).val);
           i = close+1; continue;
         }
       }
-      // computed path $( expr ) — evaluate inner with substitution first
+      // computed path $( expr ): substitute inner, eval, resolve
       let depth=1, k=j+1;
       while (k<expr.length && depth>0){ if(expr[k]==="(")depth++; if(expr[k]===")")depth--; k++; }
       const innerSrc = substitute(expr.slice(j+1, k-1), res);
@@ -299,25 +373,25 @@ function substitute(expr, res){
       out += dbl ? res.meta(path,"name",false) : valToSource(res.lookup(path).val);
       i = k; continue;
     }
-    // $$.prop (self metadata)
     if (dbl && expr[j] === "."){
       const m = /^[A-Za-z]+/.exec(expr.slice(j+1));
       if (m){ out += res.meta(null, m[0], true); i = j+1+m[0].length; continue; }
     }
-    // raw form: $name or $$name.prop — greedy chars valid in names
-    const m = /^[\w\/ .🎨#️⃣🔤⏺-]+/u.exec(expr.slice(j));
+    // raw form: like the engine, names must be space-free here — names with
+    // spaces/emoji use the call form $('…')
+    const m = /^[\w\/.-]+/.exec(expr.slice(j));
     if (m){
-      let token = m[0];
+      const token = m[0];
       if (dbl){
         const dot = token.lastIndexOf(".");
         if (dot>0){ out += res.meta(token.slice(0,dot), token.slice(dot+1), false); i = j+token.length; continue; }
       } else {
-        // trim trailing chars until a known variable resolves
+        let done = false;
         for (let len=token.length; len>0; len--){
-          const cand = token.slice(0,len).trim();
-          try { const r = res.lookup(cand); out += valToSource(r.val); i = j+len; token=null; break; } catch(e){}
+          const cand = token.slice(0,len);
+          try { const r = res.lookup(cand); out += valToSource(r.val); i = j+len; done = true; break; } catch(e){}
         }
-        if (token===null) continue;
+        if (done) continue;
       }
     }
     out += ch; i++;
@@ -326,15 +400,10 @@ function substitute(expr, res){
 }
 
 // ---------- evaluation ----------
-const stateMap = new WeakMap();
-function state(v){ let s = stateMap.get(v); if(!s){ s={out:{},err:{}}; stateMap.set(v,s);} return s; }
-
 async function evaluateModel(model, root){
   const gfSrc = model.globalFunctions || "";
   let prevSnap = "";
   for (let pass=0; pass<4; pass++){
-    // stop as soon as a pass changes nothing (deps settled) — avoids
-    // needless re-evaluation (and repeat fetches in async examples)
     const snap = JSON.stringify(Object.values(model.collections).map(c=>c.vars.map(v=>{const s=state(v);return [s.out,s.err];})));
     if (snap === prevSnap) break;
     prevSnap = snap;
@@ -348,7 +417,8 @@ async function evaluateModel(model, root){
             const body = substitute(v.expr, res);
             let value = (0,eval)(`(function(cd,cl,cv,rgba,fn,cdRandom,cdGetFormat){"use strict";${gfSrc}\nreturn eval(${JSON.stringify(body)});})`)(cd,cl,cv,rgba,fnFmt,cdRandom,cdGetFormat);
             if (value && typeof value.then==="function") value = await value;
-            st.out[mode] = value; delete st.err[mode];
+            st.out[mode] = v.type==="COLOR" ? coerceColor(value) : value;
+            delete st.err[mode];
           }catch(e){ st.err[mode] = String(e.message||e); }
         }
       }
@@ -357,16 +427,32 @@ async function evaluateModel(model, root){
   render(model, root);
 }
 
-// ---------- rendering ----------
-function fmtVal(v, type){
-  if (v===undefined||v===null) return "—";
-  const hex = type==="COLOR" ? displayColor(v) : null;
-  if (hex) return `<span class="sw" style="background:${hex}"></span><span class="val">${hex}</span>`;
-  if (typeof v==="number") return `<span class="val">${Math.round(v*1000)/1000}</span>`;
-  return `<span class="val">${String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;")}</span>`;
+// ---------- color picker popover (vanilla-colorful) ----------
+let openPop = null;
+function closePop(){ if (openPop){ openPop.remove(); openPop = null; } }
+document.addEventListener("pointerdown", e => { if (openPop && !openPop.contains(e.target) && !e.target.closest(".swbtn")) closePop(); });
+function openPicker(btn, hexVal, onChange){
+  closePop();
+  const pop = document.createElement("div");
+  pop.className = "pickpop";
+  pop.innerHTML = `<hex-color-picker color="${hexVal}"></hex-color-picker><div class="hexrow"><input type="text" value="${hexVal}" spellcheck="false"></div>`;
+  document.body.appendChild(pop);
+  const r = btn.getBoundingClientRect();
+  pop.style.left = Math.min(r.left + scrollX, scrollX + innerWidth - 240) + "px";
+  pop.style.top = (r.bottom + scrollY + 6) + "px";
+  const picker = pop.querySelector("hex-color-picker");
+  const input = pop.querySelector("input");
+  picker.addEventListener("color-changed", e => { input.value = e.detail.value; onChange(e.detail.value); });
+  input.addEventListener("change", () => { if (window.culori.parse(input.value)) { picker.color = input.value; onChange(input.value); } });
+  openPop = pop;
 }
+
+// ---------- rendering ----------
 function render(model, root){
   let html = "";
+  if (model.globalFunctions){
+    html += `<div class="gfbox"><p class="gfcap">Global Functions</p><pre><code>${model.globalFunctions.trim().replace(/&/g,"&amp;").replace(/</g,"&lt;")}</code></pre></div>`;
+  }
   for (const [cName, coll] of Object.entries(model.collections)){
     html += `<div class="colcap">${cName} <span class="dim">· modes: ${coll.modes.join(" / ")}</span></div>`;
     html += `<table><tr><th>Variable</th>${coll.modes.map(m=>`<th>${m}</th>`).join("")}</tr>`;
@@ -375,29 +461,42 @@ function render(model, root){
       html += `<tr><td><span class="vname">${v.name}</span>${v.expr?`<span class="vexpr">{{ ${v.expr.replace(/&/g,"&amp;").replace(/</g,"&lt;")} }}</span>`:""}</td>`;
       for (const m of coll.modes){
         if (v.expr){
-          html += `<td>${st.err[m]?`<span class="err" title="${st.err[m].replace(/"/g,"&quot;")}">⚠ ${st.err[m]}</span>`:fmtVal(st.out[m], v.type)}</td>`;
+          html += `<td>${st.err[m]?`<span class="err" title="${st.err[m].replace(/"/g,"&quot;")}">⚠ ${st.err[m]}</span>`:displayVal(st.out[m], v.type)}</td>`;
         } else if (v.editable !== false){
           const val = v.values[m];
           if (v.type==="COLOR"){
-            const hex = displayColor(val)||"#000000";
-            html += `<td><input type="color" value="${hex}" data-c="${cName}" data-v="${v.name}" data-m="${m}"> <span class="val">${hex}</span></td>`;
+            const hx = typeof val==="string" ? val.toLowerCase() : figToHex(val);
+            html += `<td><button class="swbtn" data-c="${cName}" data-v="${v.name}" data-m="${m}"><span class="sw" style="background:${hx}"></span>${hx}</button></td>`;
           } else if (v.type==="FLOAT"){
             html += `<td><input type="number" value="${val}" step="any" data-c="${cName}" data-v="${v.name}" data-m="${m}"></td>`;
           } else {
-            html += `<td><input type="text" value="${String(val).replace(/"/g,"&quot;")}" data-c="${cName}" data-v="${v.name}" data-m="${m}"></td>`;
+            html += `<td><input type="text" class="wide" value="${String(val).replace(/"/g,"&quot;")}" data-c="${cName}" data-v="${v.name}" data-m="${m}"></td>`;
           }
-        } else html += `<td>${fmtVal(v.values[m], v.type)}</td>`;
+        } else html += `<td>${displayVal(v.values[m], v.type)}</td>`;
       }
       html += `</tr>`;
     }
     html += `</table>`;
   }
   const box = root.querySelector(".sandbox-tables"); box.innerHTML = html;
+  const reval = () => { clearTimeout(root._t); root._t = setTimeout(()=>evaluateModel(model, root), 120); };
   box.querySelectorAll("input").forEach(inp=>{
     inp.addEventListener("input", ()=>{
       const v = model.collections[inp.dataset.c].vars.find(x=>x.name===inp.dataset.v);
       v.values[inp.dataset.m] = inp.type==="number" ? parseFloat(inp.value||"0") : inp.value;
-      clearTimeout(root._t); root._t = setTimeout(()=>evaluateModel(model, root), 120);
+      reval();
+    });
+  });
+  box.querySelectorAll(".swbtn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const v = model.collections[btn.dataset.c].vars.find(x=>x.name===btn.dataset.v);
+      const cur = typeof v.values[btn.dataset.m]==="string" ? v.values[btn.dataset.m] : figToHex(v.values[btn.dataset.m]);
+      openPicker(btn, cur, hx => {
+        v.values[btn.dataset.m] = hx;
+        btn.querySelector(".sw").style.background = hx;
+        btn.childNodes[1].textContent = hx;
+        reval();
+      });
     });
   });
 }
@@ -407,14 +506,20 @@ function mount(root, ex){
   root.innerHTML = `<h4>${ex.title}</h4><p class="hint">${ex.hint||""}</p>
     ${ex.manual?`<button class="run">Run it</button>`:""}
     <button class="reset">reset</button><div class="sandbox-tables"></div>`;
-  root.querySelector(".reset").addEventListener("click", ()=>mount(root, ex));
+  root.querySelector(".reset").addEventListener("click", ()=>{ closePop(); mount(root, ex); });
   if (ex.manual){
     render(model, root);
     root.querySelector(".run").addEventListener("click", ()=>evaluateModel(model, root));
   } else evaluateModel(model, root);
 }
 
-// ---------- the examples ----------
+// ---------- the examples (all pinned against the real engine) ----------
+const RAMP_GF = `function rampStep(seed, name) {
+  const L = {100:.95, 200:.88, 400:.7, 600:.55, 800:.4}[Number(name.split('-')[1])];
+  const s = cl.oklch(cv(seed));
+  return cl.formatHex(cl.clampRgb(cl.rgb({mode:'oklch', l:L, c:s.c, h:s.h})));
+}`;
+
 const EXAMPLES = {
 hello: {
   title: "One brand color, three derived tokens",
@@ -433,15 +538,17 @@ first: {
     { name:"spacing-l", type:"FLOAT", values:{}, expr:"$base-spacing * 2" },
   ]}}}},
 ramp: {
-  title: "OKLCH ramp — one expression for every step",
-  hint: "Each step reads its lightness from its own name via '$$.name'. Change the seed.",
-  model: { collections: { "Brand": { modes:["Value"], vars:[
-    { name:"seed", type:"COLOR", values:{ Value:"#6E56CF" } },
-    { name:"ramp-200", type:"COLOR", values:{}, expr:"const L={100:.95,200:.88,400:.7,600:.55,800:.4}[Number('$$.name'.split('-')[1])]; const s=cl.oklch(cv($seed)); cl.formatHex(cl.clampRgb(cl.rgb({mode:'oklch',l:L,c:s.c,h:s.h})))" },
-    { name:"ramp-400", type:"COLOR", values:{}, expr:"const L={100:.95,200:.88,400:.7,600:.55,800:.4}[Number('$$.name'.split('-')[1])]; const s=cl.oklch(cv($seed)); cl.formatHex(cl.clampRgb(cl.rgb({mode:'oklch',l:L,c:s.c,h:s.h})))" },
-    { name:"ramp-600", type:"COLOR", values:{}, expr:"const L={100:.95,200:.88,400:.7,600:.55,800:.4}[Number('$$.name'.split('-')[1])]; const s=cl.oklch(cv($seed)); cl.formatHex(cl.clampRgb(cl.rgb({mode:'oklch',l:L,c:s.c,h:s.h})))" },
-    { name:"ramp-800", type:"COLOR", values:{}, expr:"const L={100:.95,200:.88,400:.7,600:.55,800:.4}[Number('$$.name'.split('-')[1])]; const s=cl.oklch(cv($seed)); cl.formatHex(cl.clampRgb(cl.rgb({mode:'oklch',l:L,c:s.c,h:s.h})))" },
-  ]}}}},
+  title: "OKLCH ramp — the math lives in one Global Function",
+  hint: "Every step is the same one-line call; rampStep reads the step from the variable's own name. Change the seed.",
+  model: {
+    globalFunctions: RAMP_GF,
+    collections: { "Brand": { modes:["Value"], vars:[
+      { name:"seed", type:"COLOR", values:{ Value:"#6E56CF" } },
+      { name:"ramp-200", type:"COLOR", values:{}, expr:"rampStep($seed, '$$.name')" },
+      { name:"ramp-400", type:"COLOR", values:{}, expr:"rampStep($seed, '$$.name')" },
+      { name:"ramp-600", type:"COLOR", values:{}, expr:"rampStep($seed, '$$.name')" },
+      { name:"ramp-800", type:"COLOR", values:{}, expr:"rampStep($seed, '$$.name')" },
+    ]}}}},
 spacing: {
   title: "Density-aware spacing via relative refs",
   hint: "Base differs per density mode; every step tracks it. Note $('./Base') — “my sibling”.",
@@ -483,6 +590,16 @@ dark: {
       { name:"accent", type:"COLOR", values:{}, expr:"const src=cl.oklch(cv($('Source/accent'))); '$$.mode'==='Dark' ? cl.formatHex(cl.clampRgb(cl.rgb({mode:'oklch',l:1-src.l,c:src.c*0.8,h:src.h}))) : $('Source/accent')" },
     ]},
   }}},
+l10n: {
+  title: "Copy that translates itself",
+  hint: "Switch the values, or the language columns — welcome and items-label recompose. Strings splice as raw text, so they're built inside string literals.",
+  model: { collections: { "Strings": { modes:["EN","DE","FR"], vars:[
+    { name:"greeting", type:"STRING", values:{ EN:"Hello", DE:"Hallo", FR:"Bonjour" } },
+    { name:"user-name", type:"STRING", values:{ EN:"Neil", DE:"Neil", FR:"Neil" } },
+    { name:"count", type:"FLOAT", values:{ EN:3, DE:3, FR:1 } },
+    { name:"welcome", type:"STRING", values:{}, expr:'"$greeting, $user-name" + "!"' },
+    { name:"items-label", type:"STRING", values:{}, expr:'"$count " + ($count === 1 ? "item" : "items")' },
+  ]}}}},
 weather: {
   title: "Live: NYC feels-like temperature",
   hint: "Fetch is allowed in expressions. Click Run — this calls Open-Meteo for real.",

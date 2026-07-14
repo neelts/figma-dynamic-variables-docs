@@ -97,6 +97,8 @@ share one expression that reads its own step from its name:
   Build them only from literals and `$$` text —
   `$('ramp/' + '$$.name'.split('-')[1])` ✓ — never from a `const` declared in
   the same expression.
+- **String values splice as raw text** — use them inside string literals
+  (`"$greeting, $user-name" + "!"`), punctuation outside the reference.
 - **Async is fine**: if the value is a Promise (e.g. a `fetch` chain), the
   plugin awaits it.
 - **Colors** may be returned as hex strings, `rgb()`/`hsl()` strings, colord
@@ -130,7 +132,8 @@ function onColor(bg) {
 }
 ```
 
-…then call from any expression: `{{ onColor($('Brand/Primary')) }}`.
+…then call from any expression: `{{ onColor($('Brand/Primary')) }}` — the ramp
+recipe above does exactly this with `rampStep()`.
 
 Remember: helper code is **plain JS** — no `$` references inside it; resolve
 values in the expression and pass them as arguments. The `cd`/`cl` libraries
@@ -144,15 +147,24 @@ Every recipe below is live-editable on the
 [interactive page](https://neelts.github.io/figma-dynamic-variables-docs/),
 and pinned as a test against the real engine in the plugin repository.
 
-### Color ramp from one seed (OKLCH)
+### Color ramp from one seed (OKLCH) — with a Global Function
 
-One identical expression on every step; each reads its lightness from its own
-name:
+The math lives in ONE Global Function; every step is a readable one-line call
+that passes its own name. Adding `ramp-300` later means adding a variable, not
+another copy of the formula:
 
 ```js
-{{ const L = {100:.95, 200:.88, 400:.7, 600:.55, 800:.4}[Number('$$.name'.split('-')[1])];
-   const s = cl.oklch(cv($seed));
-   cl.formatHex(cl.clampRgb(cl.rgb({mode:'oklch', l:L, c:s.c, h:s.h}))) }}
+// Global Functions collection
+function rampStep(seed, name) {
+  const L = {100:.95, 200:.88, 400:.7, 600:.55, 800:.4}[Number(name.split('-')[1])];
+  const s = cl.oklch(cv(seed));
+  return cl.formatHex(cl.clampRgb(cl.rgb({mode:'oklch', l:L, c:s.c, h:s.h})));
+}
+```
+
+```js
+// every ramp step
+{{ rampStep($seed, '$$.name') }}
 ```
 
 ### Spacing scale with density modes
@@ -193,6 +205,18 @@ inverting OKLCH lightness and damping chroma:
    '$$.mode' === 'Dark'
      ? cl.formatHex(cl.clampRgb(cl.rgb({mode:'oklch', l: 1 - src.l, c: src.c * 0.6, h: src.h})))
      : $('Source/surface') }}
+```
+
+### Localization — languages as modes
+
+Make the modes **EN / DE / FR** and compose copy that translates itself.
+String values splice as raw **text**, so build sentences *inside* a string
+literal — and keep punctuation out of the reference (the name matcher is
+greedy: `$user-name!` reads as a variable named `user-name!`):
+
+```js
+welcome     → {{ "$greeting, $user-name" + "!" }}     // Hello, Neil! / Hallo, Neil! / Bonjour, Neil!
+items-label → {{ "$count " + ($count === 1 ? "item" : "items") }}
 ```
 
 ### Live data — weather, prices, time
