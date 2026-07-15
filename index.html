@@ -176,9 +176,12 @@ tr.exprrow td{padding:2px 8px 8px;border-bottom:1px solid var(--figma-color-bord
 </figure>
 <div class="play" data-example="first"></div>
 <p>Prefer a real editor over description fields? Open <em>Plugins<svg class="arr" aria-hidden="true" viewBox="0 0 16 16"><path d="M2.5 8h10.4M8.8 3.9 12.9 8l-4.1 4.1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Dynamic Variables<svg class="arr" aria-hidden="true" viewBox="0 0 16 16"><path d="M2.5 8h10.4M8.8 3.9 12.9 8l-4.1 4.1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Open Dynamic Variables Editor</em>: a tree of your collections with a full code editor (syntax highlighting, inline errors) — and the AI menu.</p>
-<figure class="shot" role="img" aria-label="Screenshot: the Dynamic Variables Editor window — collections tree on the left, code editor on the right with a highlighted expression and an inline error message under one line.">
-<span class="cam">📷</span>
-<figcaption><strong>Screenshot to capture:</strong> the Dynamic Variables Editor — collections tree (left), code editor (right) with an expression open and one inline error visible. Full window; ~1600px wide.</figcaption>
+<figure class="capture">
+<img class="only-dark" src="assets/capture-04-dark.png" width="2880" height="1720"
+  alt="The Dynamic Variables Editor: collections tree on the left (Global Functions, Brand, Spacing, Type, Surface, Strings, Live), the Brand collection open with ramp variables, their color swatches and rampStep expressions in inline code editors.">
+<img class="only-light" src="assets/capture-04-light.png" width="2880" height="1720"
+  alt="The Dynamic Variables Editor: collections tree on the left (Global Functions, Brand, Spacing, Type, Surface, Strings, Live), the Brand collection open with ramp variables, their color swatches and rampStep expressions in inline code editors.">
+<figcaption>The editor — collections as a tree, every expression in a real code editor.</figcaption>
 </figure>
 
 <h2 id="recipes">Recipes</h2>
@@ -218,13 +221,19 @@ tr.exprrow td{padding:2px 8px 8px;border-bottom:1px solid var(--figma-color-bord
 <li><strong>Copy Brief for AI</strong> — puts a complete brief on your clipboard: your collections, variables, current values, and the full expression syntax. Paste it into ChatGPT, Claude, Gemini — then ask in plain words: <em>"derive a 10-step ramp from brand/seed, and make button text pick black or white by contrast."</em></li>
 <li><strong>Paste AI Result</strong> — paste the assistant's reply back. The plugin parses it and shows a <strong>preview of every proposed change</strong> — old value<svg class="arr" aria-hidden="true" viewBox="0 0 16 16"><path d="M2.5 8h10.4M8.8 3.9 12.9 8l-4.1 4.1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>new expression, per variable — and nothing touches your file until you apply.</li>
 </ol>
-<figure class="shot" role="img" aria-label="Screenshot: the editor's AI menu open, showing the Copy Brief for AI and Paste AI Result commands.">
-<span class="cam">📷</span>
-<figcaption><strong>Screenshot to capture:</strong> the ✨ AI menu open in the editor, both commands visible. Crop to the menu with a little context; ~800px wide.</figcaption>
+<figure class="capture" style="max-width:280px">
+<img class="only-dark" src="assets/capture-02-dark.png" width="392" height="384"
+  alt="The editor's AI menu open: Copy current collection, Copy all, Copy errors only, Show and copy brief, Paste AI result.">
+<img class="only-light" src="assets/capture-02-light.png" width="392" height="384"
+  alt="The editor's AI menu open: Copy current collection, Copy all, Copy errors only, Show and copy brief, Paste AI result.">
+<figcaption>The ✨ AI menu — copy a brief, paste the result.</figcaption>
 </figure>
-<figure class="shot" role="img" aria-label="Screenshot: the Paste AI Result preview dialog listing proposed changes — variable names with their old values and the new expressions — with apply and cancel buttons.">
-<span class="cam">📷</span>
-<figcaption><strong>Screenshot to capture:</strong> the Paste AI Result preview showing several proposed changes (old value<svg class="arr" aria-hidden="true" viewBox="0 0 16 16"><path d="M2.5 8h10.4M8.8 3.9 12.9 8l-4.1 4.1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>new expression) before applying. Full dialog; ~1200px wide.</figcaption>
+<figure class="capture">
+<img class="only-dark" src="assets/capture-03-dark.png" width="1536" height="1680"
+  alt="The Paste AI Result preview: five ramp variables with UPDATE badges, each showing the struck-through old expression and the syntax-colored new one, with an Apply button.">
+<img class="only-light" src="assets/capture-03-light.png" width="1536" height="1680"
+  alt="The Paste AI Result preview: five ramp variables with UPDATE badges, each showing the struck-through old expression and the syntax-colored new one, with an Apply button.">
+<figcaption>Every proposed change previewed — old expression struck, new one syntax-colored — before anything is applied.</figcaption>
 </figure>
 <div class="note"><strong>Models that do well:</strong> in our test harness (20 design-system scenarios), Claude Haiku 4.5, Codex and GPT-5-mini solve nearly everything; DeepSeek is a solid budget option. Small local models tend to produce invalid expressions — the preview will catch them, but you'll have a better time with the tier above.</div>
 
