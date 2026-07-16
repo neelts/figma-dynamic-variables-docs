@@ -933,7 +933,7 @@ l10n: {
         <div style="font-size:16px;line-height:1">${flags[m]}</div>
         <div style="flex:1;background:linear-gradient(160deg,#4A90D9,#7CB9F2);color:#fff;border-radius:12px 12px 12px 3px;padding:8px 11px">
           <div style="font:600 12px Inter">${gv("Strings","welcome",m) ?? ""}</div>
-          <div style="font:11px Inter;opacity:.85">🛒 ${gv("Strings","items-label",m) ?? ""}</div>
+          <div style="display:flex;align-items:center;gap:5px;font:11px Inter;margin-top:2px"><span style="background:rgba(255,255,255,.9);border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px">🛒</span><span style="opacity:.9">${gv("Strings","items-label",m) ?? ""}</span></div>
         </div>
       </div>`
     ).join("");
