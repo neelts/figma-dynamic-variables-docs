@@ -49,7 +49,7 @@ table.ref th{background:var(--figma-color-bg-secondary)}
 .play .hint{font-size:12px;color:var(--figma-color-text-secondary);margin:0}
 .play .colcap{font-size:11px;font-weight:600;padding:10px 14px 4px;color:var(--figma-color-text-secondary);
   text-transform:uppercase;letter-spacing:.04em}
-.vrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:stretch;min-height:40px;padding:0 8px;border-bottom:1px solid var(--figma-color-border)}
+.vrow{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);align-items:stretch;min-height:40px;padding:0 8px;border-bottom:1px solid var(--figma-color-border)}
 .vrow:hover{background:var(--figma-color-bg-hover)}
 .vrow .vmain{display:flex;align-items:center;gap:4px;min-width:0;padding-right:8px}
 .vrow .ticon{width:24px;height:24px;flex:none;opacity:.9}
@@ -59,7 +59,7 @@ table.ref th{background:var(--figma-color-bg-secondary)}
   border-left:1px solid var(--figma-color-border);overflow:hidden;font-size:11px;color:var(--figma-color-text-secondary)}
 .mcell .truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--font-mono)}
 .mcell.header{font-weight:500;color:var(--figma-color-text-secondary);user-select:none;height:28px}
-.headrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:stretch;padding:0 8px;border-bottom:1px solid var(--figma-color-border);
+.headrow{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);align-items:stretch;padding:0 8px;border-bottom:1px solid var(--figma-color-border);
   background:var(--figma-color-bg-secondary)}
 .headrow .vmain{min-width:0;display:flex;align-items:center;font-size:11px;font-weight:500;color:var(--figma-color-text-secondary)}
 .sw{display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid var(--figma-color-border);flex:none}
@@ -714,7 +714,7 @@ function mount(root, ex){
   if (ex.preview){
     root._renderPreview = () => {
       const pv = root.querySelector("[data-pv]");
-      if (pv) try { pv.innerHTML = ex.preview(gv); } catch (e) { pv.innerHTML = ""; }
+      if (pv) try { pv.innerHTML = ex.preview(gv, model); } catch (e) { pv.innerHTML = ""; }
     };
   }
   const reval = (delay=120) => { clearTimeout(root._t); root._t = setTimeout(()=>evaluateModel(model, root), delay); };
@@ -800,19 +800,19 @@ const D = expr => `{{ ${expr} }}`;
 const EXAMPLES = {
 cover: {
   title: "The classic: concentric corner radius",
-  hint: "The plugin's cover example — inner = outer − padding, so nested corners always look right. Change either input.",
+  hint: "The real-world version of the cover formula: a card wraps a rounded button with some padding — deriving card-radius = button-radius + card-padding keeps the corners concentric, so they play nicely.",
   preview: gv => {
-    const pad = Math.max(0, Math.min(40, gv("Radius","padding") || 0));
-    const outer = Math.max(0, gv("Radius","outer") || 0);
-    const inner = Math.max(0, gv("Radius","inner") || 0);
-    return `<div style="width:190px;height:150px;background:#7CB9F2;border-radius:${outer}px;padding:${pad}px">
-      <div style="width:100%;height:100%;background:var(--figma-color-bg);border-radius:${inner}px"></div>
-    </div><div class="cap">outer ${outer} − padding ${pad} = inner ${inner}</div>`;
+    const br = Math.max(0, gv("Radius","button-radius") || 0);
+    const pad = Math.max(0, Math.min(40, gv("Radius","card-padding") || 0));
+    const cr = Math.max(0, gv("Radius","card-radius") || 0);
+    return `<div style="width:200px;background:var(--figma-color-bg);border:1px solid var(--figma-color-border);border-radius:${cr}px;padding:${pad}px;box-shadow:0 4px 14px rgba(0,0,0,.12)">
+      <div style="background:#0D99FF;color:#fff;border-radius:${br}px;padding:9px 0;text-align:center;font:600 12px Inter">Button</div>
+    </div><div class="cap">button ${br} + padding ${pad} = card ${cr}</div>`;
   },
   model: { collections: { "Radius": { modes:["Value"], vars:[
-    { name:"padding", type:"FLOAT", values:{ Value:16 } },
-    { name:"outer", type:"FLOAT", values:{ Value:48 } },
-    { name:"inner", type:"FLOAT", values:{}, description:D("$outer - $padding") },
+    { name:"button-radius", type:"FLOAT", values:{ Value:8 } },
+    { name:"card-padding", type:"FLOAT", values:{ Value:16 } },
+    { name:"card-radius", type:"FLOAT", values:{}, description:D("$button-radius + $card-padding") },
   ]}}}},
 hello: {
   title: "One brand color, three derived tokens",
@@ -843,12 +843,11 @@ first: {
 ramp: {
   title: "OKLCH ramp — the math lives in one Global Function",
   hint: "Fully algorithmic: lightness comes from the step number in the name. Change the seed — and RENAME the last row (ramp-950, ramp-50, ramp-137…): its color recomputes from its own name.",
-  preview: gv => {
-    const chip = n => `<div style="display:flex;align-items:center;gap:8px;width:100%">
-      <div style="width:26px;height:26px;border-radius:6px;background:${gv("Brand",n)};border:1px solid var(--figma-color-border)"></div>
-      <div class="cap" style="text-transform:none">${n}</div></div>`;
-    return ["seed","ramp-200","ramp-400","ramp-500","ramp-600","ramp-800"].map(chip).join("");
-  },
+  preview: (gv, model) => model.collections.Brand.vars.map(v =>
+    `<div style="display:flex;align-items:center;gap:8px;width:100%">
+      <div style="width:26px;height:26px;border-radius:6px;background:${gv("Brand",v.name)};border:1px solid var(--figma-color-border)"></div>
+      <div class="cap" style="text-transform:none">${esc(v.name)}</div></div>`
+  ).join(""),
   model: {
     globalFunctions: RAMP_GF,
     collections: { "Brand": { modes:["Value"], vars:[
@@ -883,7 +882,7 @@ type: {
   ).join(""),
   model: { collections: { "Type": { modes:["Value"], vars:[
     { name:"body", type:"FLOAT", values:{ Value:16 } },
-    { name:"ratio", type:"FLOAT", values:{ Value:1.25 } },
+    { name:"ratio", type:"FLOAT", values:{ Value:1.5 } },
     { name:"heading-md", type:"FLOAT", values:{}, description:D("Math.round($body * $ratio)") },
     { name:"heading-lg", type:"FLOAT", values:{}, description:D("Math.round($('heading-md') * $ratio)") },
     { name:"heading-xl", type:"FLOAT", values:{}, description:D("Math.round($('heading-lg') * $ratio)") },
@@ -920,19 +919,25 @@ dark: {
       { name:"accent", type:"COLOR", values:{ "Light values":"#C2540E" } },
     ]},
     "Theme": { modes:["Light","Dark"], vars:[
-      { name:"surface", type:"COLOR", values:{}, description:D("const src=cl.oklch(cv($('Source/surface'))); '$$.mode'==='Dark' ? cl.formatHex(cl.clampRgb(cl.rgb({mode:'oklch',l:1-src.l,c:src.c*0.6,h:src.h}))) : $('Source/surface')") },
-      { name:"accent", type:"COLOR", values:{}, description:D("const src=cl.oklch(cv($('Source/accent'))); '$$.mode'==='Dark' ? cl.formatHex(cl.clampRgb(cl.rgb({mode:'oklch',l:1-src.l,c:src.c*0.8,h:src.h}))) : $('Source/accent')") },
+      { name:"surface", type:"COLOR", values:{}, description:"{{\nconst light = $('Source/surface');\nconst src = cl.oklch(cv(light));\nconst dark = { mode: 'oklch', l: 1 - src.l, c: src.c * 0.6, h: src.h };\n'$$.mode' === 'Dark' ? cl.formatHex(cl.clampRgb(cl.rgb(dark))) : light;\n}}" },
+      { name:"accent", type:"COLOR", values:{}, description:"{{\nconst light = $('Source/accent');\nconst src = cl.oklch(cv(light));\nconst dark = { mode: 'oklch', l: 1 - src.l, c: src.c * 0.8, h: src.h };\n'$$.mode' === 'Dark' ? cl.formatHex(cl.clampRgb(cl.rgb(dark))) : light;\n}}" },
     ]},
   }}},
 l10n: {
   title: "Copy that translates itself",
   hint: "Switch the values — welcome and items-label recompose per language. Strings splice as raw text (built inside literals); the unit word is picked from a translated array by bare numeric $$.modeIndex.",
-  preview: gv => ["EN","DE","FR"].map(m =>
-    `<div style="width:100%;background:var(--figma-color-bg);border:1px solid var(--figma-color-border);border-radius:9px;padding:8px 10px">
-      <div style="font:600 12px Inter;color:var(--figma-color-text)">${gv("Strings","welcome",m) ?? ""}</div>
-      <div style="font:11px Inter;color:var(--figma-color-text-secondary)">🛒 ${gv("Strings","items-label",m) ?? ""}</div>
-    </div><div class="cap">${m}</div>`
-  ).join(""),
+  preview: gv => {
+    const flags = { EN: "🇬🇧", DE: "🇩🇪", FR: "🇫🇷" };
+    return ["EN","DE","FR"].map(m =>
+      `<div style="display:flex;gap:7px;width:100%;align-items:flex-end">
+        <div style="font-size:16px;line-height:1">${flags[m]}</div>
+        <div style="flex:1;background:linear-gradient(160deg,#4A90D9,#7CB9F2);color:#fff;border-radius:12px 12px 12px 3px;padding:8px 11px">
+          <div style="font:600 12px Inter">${gv("Strings","welcome",m) ?? ""}</div>
+          <div style="font:11px Inter;opacity:.85">🛒 ${gv("Strings","items-label",m) ?? ""}</div>
+        </div>
+      </div>`
+    ).join("");
+  },
   model: { collections: { "Strings": { modes:["EN","DE","FR"], vars:[
     { name:"greeting", type:"STRING", values:{ EN:"Hello", DE:"Hallo", FR:"Bonjour" } },
     { name:"user-name", type:"STRING", values:{ EN:"Neil", DE:"Neil", FR:"Neil" } },
@@ -941,23 +946,25 @@ l10n: {
     { name:"items-label", type:"STRING", values:{}, description:'{{ "$count " + ($count === 1 ? ["item","Artikel","article"][$$.modeIndex] : ["items","Artikel","articles"][$$.modeIndex]) }}' },
   ]}}}},
 weather: {
-  title: "Live: feels-like temperature, any city",
-  hint: "Type a city, flip the °F switch, click Run — a geocoding fetch feeds a weather fetch, for real. Two variables drive one expression.",
+  title: "Live: feels-like temperature, any city — throttled",
+  hint: "Type a city, flip the °F switch, click Run. The trick: feels-like reads its OWN previous value ($$.values[$$.modeIndex]) and only re-fetches when the minute stamp from $updated has expired — the API is hit at most once a minute even under continuous monitoring.",
   manual: true,
   preview: gv => {
-    const t = gv("Live","feels-like");
-    const ran = /°/.test(String(t));
+    const t = String(gv("Live","feels-like") ?? "");
+    const ran = /°/.test(t);
+    const [temp, stamp] = ran ? t.split(" · ") : ["–°", ""];
     return `<div style="width:100%;background:linear-gradient(160deg,#4A90D9,#7CB9F2);border-radius:12px;padding:14px;color:#fff">
       <div style="font:600 12px Inter;opacity:.9">${esc(gv("Live","city") || "")}</div>
-      <div style="font:600 30px Inter;line-height:1.2">${ran ? esc(t) : "–°"}</div>
-      <div style="font:11px Inter;opacity:.85">${ran ? "feels like" : "click Run it"}</div>
+      <div style="font:600 30px Inter;line-height:1.2">${esc(temp)}</div>
+      <div style="font:11px Inter;opacity:.85">${ran ? "feels like · updated " + esc(stamp || "") : "click Run it"}</div>
     </div>`;
   },
   model: { collections: { "Live": { modes:["Value"], vars:[
     { name:"city", type:"STRING", values:{ Value:"New York" } },
     { name:"use-fahrenheit", type:"BOOLEAN", values:{ Value:true } },
+    { name:"updated", type:"STRING", values:{ Value:"" }, description:D('new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })') },
     { name:"feels-like", type:"STRING", values:{ Value:"— click Run —" }, editable:false,
-      description:"{{\nconst unit = $use-fahrenheit ? \"fahrenheit\" : \"celsius\";\nconst suffix = $use-fahrenheit ? \"\u00b0F\" : \"\u00b0C\";\nfetch(\"https://geocoding-api.open-meteo.com/v1/search?count=1&name=\" + encodeURIComponent(\"$city\"))\n  .then(r => r.json())\n  .then(g => {\n    const place = g.results[0];\n    const url = \"https://api.open-meteo.com/v1/forecast?current=apparent_temperature\"\n      + \"&latitude=\" + place.latitude\n      + \"&longitude=\" + place.longitude\n      + \"&temperature_unit=\" + unit;\n    return fetch(url);\n  })\n  .then(r => r.json())\n  .then(d => Math.round(d.current.apparent_temperature) + suffix);\n}}" },
+      description:"{{\nconst cached = String($$.values[$$.modeIndex]);\ncached.endsWith(\"\u00b7 \" + \"$updated\")\n  ? cached\n  : fetch(\"https://geocoding-api.open-meteo.com/v1/search?count=1&name=\" + encodeURIComponent(\"$city\"))\n      .then(r => r.json())\n      .then(g => fetch(\"https://api.open-meteo.com/v1/forecast?current=apparent_temperature\"\n        + \"&latitude=\" + g.results[0].latitude + \"&longitude=\" + g.results[0].longitude\n        + \"&temperature_unit=\" + ($use-fahrenheit ? \"fahrenheit\" : \"celsius\")))\n      .then(r => r.json())\n      .then(d => Math.round(d.current.apparent_temperature) + ($use-fahrenheit ? \"\u00b0F\" : \"\u00b0C\") + \" \u00b7 \" + \"$updated\");\n}}" },
   ]}}}},
 };
 

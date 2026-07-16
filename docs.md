@@ -153,15 +153,16 @@ and pinned as a test against the real engine in the plugin repository.
 
 ### The classic: concentric corner radius
 
-The plugin's cover example. Nested rounded corners only look right when the
-inner radius is the outer radius minus the padding between them:
+The plugin's cover formula, in its everyday form: a card wraps a rounded
+button with some padding, and only one radius is truly a choice — derive the
+card's from the button's and the corners stay concentric:
 
 ```js
-inner → {{ $outer - $padding }}
+card-radius → {{ $button-radius + $card-padding }}
 ```
 
-Change `padding` or `outer` and `inner` follows. (The fuller version clamps
-at zero for deep nesting: `{{ Math.max(0, $('../radius') - $('Primitives/Nesting Gap')) }}`.)
+Change the button radius or the padding and the card follows. (For deep
+nesting, clamp at zero: `{{ Math.max(0, $('../radius') - $('Primitives/Nesting Gap')) }}`.)
 
 ### Color ramp from one seed (OKLCH) — with a Global Function
 
@@ -221,10 +222,12 @@ Author a single-mode `Source` palette; the two-mode `Theme` derives Dark by
 inverting OKLCH lightness and damping chroma:
 
 ```js
-{{ const src = cl.oklch(cv($('Source/surface')));
-   '$$.mode' === 'Dark'
-     ? cl.formatHex(cl.clampRgb(cl.rgb({mode:'oklch', l: 1 - src.l, c: src.c * 0.6, h: src.h})))
-     : $('Source/surface') }}
+{{
+  const light = $('Source/surface');
+  const src = cl.oklch(cv(light));
+  const dark = { mode: 'oklch', l: 1 - src.l, c: src.c * 0.6, h: src.h };
+  '$$.mode' === 'Dark' ? cl.formatHex(cl.clampRgb(cl.rgb(dark))) : light;
+}}
 ```
 
 ### Localization — languages as modes
@@ -240,31 +243,38 @@ items-label → {{ "$count " + ($count === 1 ? ["item","Artikel","article"][$$.m
                                              : ["items","Artikel","articles"][$$.modeIndex]) }}
 ```
 
-### Live data — weather, prices, time
+### Live data — weather, prices, time (throttled)
 
-Expressions can `fetch`; the plugin awaits the Promise:
-
-Two hand-set variables — a `city` STRING and a `use-fahrenheit` BOOLEAN —
-drive a geocoding fetch that feeds a weather fetch:
+Expressions can `fetch`; the plugin awaits the Promise. Two hand-set
+variables — a `city` STRING and a `use-fahrenheit` BOOLEAN — drive a
+geocoding fetch that feeds a weather fetch. And because monitoring
+re-evaluates every tick, the expression throttles itself: it reads its OWN
+previous value (`$$.values[$$.modeIndex]` — the self metadata array indexed
+by the numeric mode index) and only re-fetches when the minute stamp from a
+small clock variable has expired:
 
 ```js
-{{
-const unit = $use-fahrenheit ? "fahrenheit" : "celsius";
-const suffix = $use-fahrenheit ? "°F" : "°C";
-fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&name=" + encodeURIComponent("$city"))
-  .then(r => r.json())
-  .then(g => {
-    const place = g.results[0];
-    const url = "https://api.open-meteo.com/v1/forecast?current=apparent_temperature"
-      + "&latitude=" + place.latitude
-      + "&longitude=" + place.longitude
-      + "&temperature_unit=" + unit;
-    return fetch(url);
-  })
-  .then(r => r.json())
-  .then(d => Math.round(d.current.apparent_temperature) + suffix);
+updated → {{ new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) }}
+```
+
+```js
+feels-like → {{
+  const cached = String($$.values[$$.modeIndex]);
+  cached.endsWith("· " + "$updated")
+    ? cached                                  // same minute — keep it, no API call
+    : fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&name=" + encodeURIComponent("$city"))
+        .then(r => r.json())
+        .then(g => fetch("https://api.open-meteo.com/v1/forecast?current=apparent_temperature"
+          + "&latitude=" + g.results[0].latitude + "&longitude=" + g.results[0].longitude
+          + "&temperature_unit=" + ($use-fahrenheit ? "fahrenheit" : "celsius")))
+        .then(r => r.json())
+        .then(d => Math.round(d.current.apparent_temperature)
+          + ($use-fahrenheit ? "°F" : "°C") + " · " + "$updated");
 }}
 ```
+
+The result reads like `92°F · 14:03` — the stamp doubles as an honest
+"updated at" label.
 
 Multi-statement expressions read top-to-bottom: set up locals with `const`,
 and the **last statement** is the variable's value (a trailing semicolon is
