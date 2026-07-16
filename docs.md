@@ -290,6 +290,10 @@ fine). `return` works inside the arrow bodies — it's only a *top-level*
 
 ---
 
+🧳 Coming from Tokens Studio or another token pipeline? The recipes above
+are your parity bridge — and code `MIGRATING` at checkout acknowledges that
+switching takes work.
+
 ## AI editing — describe it, don't code it *(2.0)*
 
 In the editor, the ✨ AI menu gives you a two-step loop that works with
