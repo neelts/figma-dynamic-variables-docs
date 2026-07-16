@@ -291,8 +291,9 @@ fine). `return` works inside the arrow bodies — it's only a *top-level*
 ---
 
 🧳 Coming from Tokens Studio or another token pipeline? The recipes above
-are your parity bridge — and code `MIGRATING` at checkout acknowledges that
-switching takes work.
+are your parity bridge — and code `MIGRATING` at
+[checkout](https://neelts.lemonsqueezy.com/buy/7753e037-3c90-404f-8cbb-508ba5bfc2eb?checkout[discount_code]=MIGRATING) acknowledges
+that switching takes work.
 
 ## AI editing — describe it, don't code it *(2.0)*
 
@@ -372,7 +373,7 @@ activation resets).
 ---
 
 🎓 **You read the whole thing.** That deserves something: use code
-`IREADTHEDOCS` at [checkout](https://neelts.lemonsqueezy.com/buy/7753e037-3c90-404f-8cbb-508ba5bfc2eb)
+`IREADTHEDOCS` at [checkout](https://neelts.lemonsqueezy.com/buy/7753e037-3c90-404f-8cbb-508ba5bfc2eb?checkout[discount_code]=IREADTHEDOCS)
 for a reader's discount on Pro. Thanks for caring about the details — you're
 exactly who this plugin is for.
 
