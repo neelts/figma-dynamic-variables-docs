@@ -151,6 +151,18 @@ Every recipe below is live-editable on the
 [interactive page](https://neelts.github.io/figma-dynamic-variables-docs/),
 and pinned as a test against the real engine in the plugin repository.
 
+### The classic: concentric corner radius
+
+The plugin's cover example. Nested rounded corners only look right when the
+inner radius is the outer radius minus the padding between them:
+
+```js
+inner → {{ $outer - $padding }}
+```
+
+Change `padding` or `outer` and `inner` follows. (The fuller version clamps
+at zero for deep nesting: `{{ Math.max(0, $('../radius') - $('Primitives/Nesting Gap')) }}`.)
+
 ### Color ramp from one seed (OKLCH) — with a Global Function
 
 The math lives in ONE Global Function; every step is a readable one-line call

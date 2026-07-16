@@ -157,6 +157,7 @@ tr.exprrow td{padding:2px 8px 8px;border-bottom:1px solid var(--figma-color-bord
 
 <h2 id="try">Try it — right here <span class="pill">live</span></h2>
 <p>These tables are <em>editable</em> — and so are the expressions: every one is a live code editor that saves itself a second after you stop typing, just like in the plugin (the <code>{{ }}</code> wrapper stays hidden, also like in the plugin). Change the base color and watch the derived shades recompute — exactly what the plugin does to your real Figma variables on every update.</p>
+<div class="play" data-example="cover"></div>
 <div class="play" data-example="hello"></div>
 <div class="note"><strong>Demo, not the engine:</strong> these examples run in a small in-page sandbox that mimics the plugin's expression semantics — same syntax, same <code>cd</code>/<code>cl</code> libraries, same editor behavior — to give you the closest possible feel. It is not the plugin's engine, and edge cases may behave differently; the plugin is always the source of truth. Every example shown here is pinned as a test against the real engine in the plugin's repository, so what the docs claim is what the plugin computes.</div>
 
@@ -757,6 +758,14 @@ const RAMP_GF = `function rampStep(seed, name) {
 const D = expr => `{{ ${expr} }}`;
 
 const EXAMPLES = {
+cover: {
+  title: "The classic: concentric corner radius",
+  hint: "The plugin's cover example — inner = outer − padding, so nested corners always look right. Change either input.",
+  model: { collections: { "Radius": { modes:["Value"], vars:[
+    { name:"padding", type:"FLOAT", values:{ Value:16 } },
+    { name:"outer", type:"FLOAT", values:{ Value:48 } },
+    { name:"inner", type:"FLOAT", values:{}, description:D("$outer - $padding") },
+  ]}}}},
 hello: {
   title: "One brand color, three derived tokens",
   hint: "Pick a new brand color — hover, pressed and the on-color follow. The expressions are live editors: change one, it saves itself a second later. As in the plugin, the {{ }} wrapper is hidden — you edit just the expression.",
