@@ -365,5 +365,12 @@ removes the limit and funds development — activate via *Dynamic Variables →
 Pro License → Activate Key* (5 devices, 10 on Unlimited; write me for
 activation resets).
 
+---
+
+🎓 **You read the whole thing.** That deserves something: use code
+`IREADTHEDOCS` at [checkout](https://neelts.lemonsqueezy.com/buy/7753e037-3c90-404f-8cbb-508ba5bfc2eb)
+for a reader's discount on Pro. Thanks for caring about the details — you're
+exactly who this plugin is for.
+
 [Dynamic Variables on Figma Community](https://www.figma.com/community/plugin/1365339609215368041) ·
 [Subscribe for updates](https://neelts.lemonsqueezy.com)
