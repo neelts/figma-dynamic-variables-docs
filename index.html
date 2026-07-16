@@ -101,6 +101,14 @@ button.reset:hover{color:var(--figma-color-text)}
 nav.toc{font-size:13px;background:var(--figma-color-bg-secondary);border:1px solid var(--figma-color-border);border-radius:13px;padding:12px 18px;margin:22px 0}
 nav.toc a{display:inline-block;margin:2px 12px 2px 0}
 footer{margin-top:70px;border-top:1px solid var(--figma-color-border);padding-top:16px;font-size:12.5px;color:var(--figma-color-text-secondary)}
+/* live visual preview pane */
+.playbody{display:flex;align-items:stretch}
+.playbody .sandbox-tables{flex:1;min-width:0}
+.pv{flex:none;width:250px;border-left:1px solid var(--figma-color-border);background:var(--figma-color-bg-secondary);
+  display:flex;align-items:center;justify-content:center;padding:16px;overflow:hidden}
+.pv-inner{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%}
+.pv .cap{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--figma-color-text-tertiary);text-align:center}
+@media (max-width:720px){.playbody{flex-direction:column}.pv{width:auto;border-left:none;border-top:1px solid var(--figma-color-border)}}
 /* color picker (vanilla-colorful) */
 .pickpop{position:absolute;z-index:40;background:var(--figma-color-bg);border:1px solid var(--figma-color-border);
   border-radius:13px;box-shadow:0 5px 24px rgba(0,0,0,.25);padding:10px}
@@ -622,6 +630,7 @@ function cellContent(v, mode){
   return `<span class="truncate">${esc(val)}</span>`;
 }
 function refresh(model, root){
+  root._renderPreview?.();
   root.querySelectorAll("[data-cell]").forEach(td => {
     const [cName, id, mode] = JSON.parse(td.dataset.cell);
     for (const c of Object.values(model.collections)){
@@ -674,9 +683,40 @@ function mount(root, ex){
     }
   }
   if (ex.manual) html += `<button class="run">Run it</button>`;
-  root.innerHTML = html;
+  root.innerHTML = `<div class="playhead-slot"></div><div class="playbody"><div class="tables-slot"></div>${ex.preview ? '<div class="pv"><div class="pv-inner" data-pv></div></div>' : ""}</div>`;
+  // split the assembled html: head stays above, the rest goes into the tables column
+  {
+    const tmp = document.createElement("div");
+    tmp.innerHTML = html;
+    const headEl = tmp.querySelector(".playhead");
+    root.querySelector(".playhead-slot").replaceWith(headEl);
+    const tablesSlot = root.querySelector(".tables-slot");
+    tablesSlot.classList.add("sandbox-tables");
+    tablesSlot.classList.remove("tables-slot");
+    while (tmp.firstChild) tablesSlot.appendChild(tmp.firstChild);
+  }
 
   const findById = id => { for (const c of Object.values(model.collections)){ const v = c.vars.find(x=>x.id===id); if (v) return v; } };
+  // computed-value getter for previews: colors as hex, everything else raw
+  const gv = (cName, vName, mode) => {
+    const coll = model.collections[cName];
+    const v = coll.vars.find(x => x.name === vName);
+    if (!v) return undefined;
+    const m = mode ?? coll.modes[0];
+    const st = state(v);
+    const raw = st.out[m] !== undefined ? st.out[m] : v.values[m];
+    if (v.type === "COLOR"){
+      if (isFig(raw)) return figToHex(raw);
+      if (typeof raw === "string") return raw.startsWith("#") ? raw : "#" + raw;
+    }
+    return raw;
+  };
+  if (ex.preview){
+    root._renderPreview = () => {
+      const pv = root.querySelector("[data-pv]");
+      if (pv) try { pv.innerHTML = ex.preview(gv); } catch (e) { pv.innerHTML = ""; }
+    };
+  }
   const reval = (delay=120) => { clearTimeout(root._t); root._t = setTimeout(()=>evaluateModel(model, root), delay); };
 
   root.querySelector(".reset").addEventListener("click", ()=>{ closePop(); (root._eds||[]).forEach(e=>e.dispose()); mount(root, ex); });
@@ -761,6 +801,14 @@ const EXAMPLES = {
 cover: {
   title: "The classic: concentric corner radius",
   hint: "The plugin's cover example — inner = outer − padding, so nested corners always look right. Change either input.",
+  preview: gv => {
+    const pad = Math.max(0, Math.min(40, gv("Radius","padding") || 0));
+    const outer = Math.max(0, gv("Radius","outer") || 0);
+    const inner = Math.max(0, gv("Radius","inner") || 0);
+    return `<div style="width:190px;height:150px;background:#7CB9F2;border-radius:${outer}px;padding:${pad}px">
+      <div style="width:100%;height:100%;background:var(--figma-color-bg);border-radius:${inner}px"></div>
+    </div><div class="cap">outer ${outer} − padding ${pad} = inner ${inner}</div>`;
+  },
   model: { collections: { "Radius": { modes:["Value"], vars:[
     { name:"padding", type:"FLOAT", values:{ Value:16 } },
     { name:"outer", type:"FLOAT", values:{ Value:48 } },
@@ -769,6 +817,12 @@ cover: {
 hello: {
   title: "One brand color, three derived tokens",
   hint: "Pick a new brand color — hover, pressed and the on-color follow. The expressions are live editors: change one, it saves itself a second later. As in the plugin, the {{ }} wrapper is hidden — you edit just the expression.",
+  preview: gv => {
+    const btn = (bg, label) => `<div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+      <div style="background:${gv("Brand",bg)};color:${gv("Brand","on-primary")};font:600 12px Inter;padding:7px 20px;border-radius:7px">Button</div>
+      <div class="cap">${label}</div></div>`;
+    return btn("primary","default") + btn("primary-hover","hover") + btn("primary-pressed","pressed");
+  },
   model: { collections: { "Brand": { modes:["Value"], vars:[
     { name:"primary", type:"COLOR", values:{ Value:"#0D99FF" } },
     { name:"primary-hover", type:"COLOR", values:{}, description:D("cd($primary).darken(0.08)") },
@@ -778,6 +832,10 @@ hello: {
 first: {
   title: "Your first formula",
   hint: "spacing-l is twice the base — try 10.",
+  preview: gv => {
+    const bar = (v, label) => `<div style="width:100%"><div style="height:${Math.max(1,v)}px;background:#7CB9F2;border-radius:3px;width:100%"></div><div class="cap">${label} · ${v}</div></div>`;
+    return bar(gv("Spacing","base-spacing"), "base-spacing") + bar(gv("Spacing","spacing-l"), "spacing-l");
+  },
   model: { collections: { "Spacing": { modes:["Value"], vars:[
     { name:"base-spacing", type:"FLOAT", values:{ Value:8 } },
     { name:"spacing-l", type:"FLOAT", values:{}, description:D("$base-spacing * 2") },
@@ -785,6 +843,12 @@ first: {
 ramp: {
   title: "OKLCH ramp — the math lives in one Global Function",
   hint: "Fully algorithmic: lightness comes from the step number in the name. Change the seed — and RENAME the last row (ramp-950, ramp-50, ramp-137…): its color recomputes from its own name.",
+  preview: gv => {
+    const chip = n => `<div style="display:flex;align-items:center;gap:8px;width:100%">
+      <div style="width:26px;height:26px;border-radius:6px;background:${gv("Brand",n)};border:1px solid var(--figma-color-border)"></div>
+      <div class="cap" style="text-transform:none">${n}</div></div>`;
+    return ["seed","ramp-200","ramp-400","ramp-500","ramp-600","ramp-800"].map(chip).join("");
+  },
   model: {
     globalFunctions: RAMP_GF,
     collections: { "Brand": { modes:["Value"], vars:[
@@ -798,6 +862,13 @@ ramp: {
 spacing: {
   title: "Density-aware spacing via relative refs",
   hint: "Base differs per density mode; every step tracks it. Note $('./Base') — “my sibling”.",
+  preview: gv => {
+    const row = mode => {
+      const box = n => `<div style="width:${gv("Spacing",n,mode)}px;height:16px;background:#7CB9F2;border-radius:3px"></div>`;
+      return `<div style="width:100%"><div style="display:flex;gap:4px;align-items:center">${box("spacing/xs")}${box("spacing/md")}${box("spacing/xl")}</div><div class="cap">${mode}</div></div>`;
+    };
+    return row("Compact") + row("Default") + row("Comfortable");
+  },
   model: { collections: { "Spacing": { modes:["Compact","Default","Comfortable"], vars:[
     { name:"spacing/Base", type:"FLOAT", values:{ Compact:12, Default:16, Comfortable:20 } },
     { name:"spacing/xs", type:"FLOAT", values:{}, description:D("Math.round($('./Base') * 0.5)") },
@@ -807,6 +878,9 @@ spacing: {
 type: {
   title: "Type scale — build on the previous step",
   hint: "heading-lg references heading-md, not the root formula.",
+  preview: gv => ["body","heading-md","heading-lg","heading-xl"].map(n =>
+    `<div style="font:600 ${gv("Type",n)}px Inter;color:var(--figma-color-text);line-height:1.15">Aa ${gv("Type",n)}</div>`
+  ).join(""),
   model: { collections: { "Type": { modes:["Value"], vars:[
     { name:"body", type:"FLOAT", values:{ Value:16 } },
     { name:"ratio", type:"FLOAT", values:{ Value:1.25 } },
@@ -817,6 +891,14 @@ type: {
 oncolor: {
   title: "Contrast-picked text color, per mode",
   hint: "Make Light's background dark — the text flips to white. Real WCAG contrast, not a guess.",
+  preview: gv => ["Light","Dark"].map(m => {
+    const ratio = gv("Surface","contrast-ratio",m);
+    const aa = gv("Surface","passes-aa",m);
+    return `<div style="width:100%;background:${gv("Surface","background",m)};border:1px solid var(--figma-color-border);border-radius:9px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between">
+      <span style="color:${gv("Surface","text",m)};font:600 16px Inter">Aa</span>
+      <span style="color:${gv("Surface","text",m)};font:11px Inter;opacity:.8">${typeof ratio==="number"?ratio.toFixed(1):"–"}:1 ${aa?"✓ AA":"✗"}</span>
+    </div><div class="cap">${m}</div>`;
+  }).join(""),
   model: { collections: { "Surface": { modes:["Light","Dark"], vars:[
     { name:"background", type:"COLOR", values:{ Light:"#F4ECE2", Dark:"#141A24" } },
     { name:"text", type:"COLOR", values:{}, description:D("cd('#FFFFFF').contrast(cd($background)) >= cd('#000000').contrast(cd($background)) ? '#FFFFFF' : '#000000'") },
@@ -826,6 +908,12 @@ oncolor: {
 dark: {
   title: "Dark derives from Light",
   hint: "You author only the Source palette. Theme's Dark column inverts OKLCH lightness and damps chroma — note the quoted '$$.mode'.",
+  preview: gv => ["Light","Dark"].map(m =>
+    `<div style="width:100%;background:${gv("Theme","surface",m)};border:1px solid var(--figma-color-border);border-radius:9px;padding:10px 12px;display:flex;align-items:center;gap:8px">
+      <div style="width:18px;height:18px;border-radius:50%;background:${gv("Theme","accent",m)}"></div>
+      <div style="flex:1;height:6px;border-radius:3px;background:${gv("Theme","accent",m)};opacity:.5"></div>
+    </div><div class="cap">${m}</div>`
+  ).join(""),
   model: { collections: {
     "Source": { modes:["Light values"], vars:[
       { name:"surface", type:"COLOR", values:{ "Light values":"#F7F5F2" } },
@@ -839,6 +927,12 @@ dark: {
 l10n: {
   title: "Copy that translates itself",
   hint: "Switch the values — welcome and items-label recompose per language. Strings splice as raw text (built inside literals); the unit word is picked from a translated array by bare numeric $$.modeIndex.",
+  preview: gv => ["EN","DE","FR"].map(m =>
+    `<div style="width:100%;background:var(--figma-color-bg);border:1px solid var(--figma-color-border);border-radius:9px;padding:8px 10px">
+      <div style="font:600 12px Inter;color:var(--figma-color-text)">${gv("Strings","welcome",m) ?? ""}</div>
+      <div style="font:11px Inter;color:var(--figma-color-text-secondary)">🛒 ${gv("Strings","items-label",m) ?? ""}</div>
+    </div><div class="cap">${m}</div>`
+  ).join(""),
   model: { collections: { "Strings": { modes:["EN","DE","FR"], vars:[
     { name:"greeting", type:"STRING", values:{ EN:"Hello", DE:"Hallo", FR:"Bonjour" } },
     { name:"user-name", type:"STRING", values:{ EN:"Neil", DE:"Neil", FR:"Neil" } },
@@ -850,6 +944,15 @@ weather: {
   title: "Live: feels-like temperature, any city",
   hint: "Type a city, flip the °F switch, click Run — a geocoding fetch feeds a weather fetch, for real. Two variables drive one expression.",
   manual: true,
+  preview: gv => {
+    const t = gv("Live","feels-like");
+    const ran = /°/.test(String(t));
+    return `<div style="width:100%;background:linear-gradient(160deg,#4A90D9,#7CB9F2);border-radius:12px;padding:14px;color:#fff">
+      <div style="font:600 12px Inter;opacity:.9">${esc(gv("Live","city") || "")}</div>
+      <div style="font:600 30px Inter;line-height:1.2">${ran ? esc(t) : "–°"}</div>
+      <div style="font:11px Inter;opacity:.85">${ran ? "feels like" : "click Run it"}</div>
+    </div>`;
+  },
   model: { collections: { "Live": { modes:["Value"], vars:[
     { name:"city", type:"STRING", values:{ Value:"New York" } },
     { name:"use-fahrenheit", type:"BOOLEAN", values:{ Value:true } },
