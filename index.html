@@ -49,17 +49,17 @@ table.ref th{background:var(--figma-color-bg-secondary)}
 .play .hint{font-size:12px;color:var(--figma-color-text-secondary);margin:0}
 .play .colcap{font-size:11px;font-weight:600;padding:10px 14px 4px;color:var(--figma-color-text-secondary);
   text-transform:uppercase;letter-spacing:.04em}
-.vrow{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);align-items:stretch;min-height:40px;padding:0 8px;border-bottom:1px solid var(--figma-color-border)}
+.vrow{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,5fr);align-items:stretch;min-height:40px;padding:0 8px;border-bottom:1px solid var(--figma-color-border)}
 .vrow:hover{background:var(--figma-color-bg-hover)}
 .vrow .vmain{display:flex;align-items:center;gap:4px;min-width:0;padding-right:8px}
 .vrow .ticon{width:24px;height:24px;flex:none;opacity:.9}
 .vrow .vname{font-family:var(--font-mono);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .modestrip{min-width:0;display:flex;align-items:stretch;overflow:hidden}
-.mcell{display:flex;align-items:center;gap:6px;flex:1 1 120px;min-width:120px;padding:0 12px;
+.mcell{display:flex;align-items:center;gap:6px;flex:1 1 96px;min-width:96px;padding:0 10px;
   border-left:1px solid var(--figma-color-border);overflow:hidden;font-size:11px;color:var(--figma-color-text-secondary)}
 .mcell .truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--font-mono)}
-.mcell.header{font-weight:500;color:var(--figma-color-text-secondary);user-select:none;height:28px}
-.headrow{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);align-items:stretch;padding:0 8px;border-bottom:1px solid var(--figma-color-border);
+.mcell.header{font-weight:500;color:var(--figma-color-text-secondary);user-select:none;height:28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;line-height:28px}
+.headrow{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,5fr);align-items:stretch;padding:0 8px;border-bottom:1px solid var(--figma-color-border);
   background:var(--figma-color-bg-secondary)}
 .headrow .vmain{min-width:0;display:flex;align-items:center;font-size:11px;font-weight:500;color:var(--figma-color-text-secondary)}
 .sw{display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid var(--figma-color-border);flex:none}
@@ -925,7 +925,7 @@ dark: {
   }}},
 l10n: {
   title: "Copy that translates itself",
-  hint: "Switch the values — welcome and items-label recompose per language. Strings splice as raw text (built inside literals); the unit word is picked from a translated array by bare numeric $$.modeIndex.",
+  hint: "Switch the values — welcome and likes-label recompose per language. Strings splice as raw text (built inside literals); the unit word is picked from a translated array by bare numeric $$.modeIndex.",
   preview: gv => {
     const flags = { EN: "🇬🇧", DE: "🇩🇪", FR: "🇫🇷" };
     return ["EN","DE","FR"].map(m =>
@@ -933,7 +933,7 @@ l10n: {
         <div style="font-size:16px;line-height:1">${flags[m]}</div>
         <div style="flex:1;background:linear-gradient(160deg,#4A90D9,#7CB9F2);color:#fff;border-radius:12px 12px 12px 3px;padding:8px 11px">
           <div style="font:600 12px Inter">${gv("Strings","welcome",m) ?? ""}</div>
-          <div style="display:flex;align-items:center;gap:5px;font:11px Inter;margin-top:2px"><span style="background:rgba(255,255,255,.9);border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px">🛒</span><span style="opacity:.9">${gv("Strings","items-label",m) ?? ""}</span></div>
+          <div style="display:flex;align-items:center;gap:5px;font:11px Inter;margin-top:2px"><span style="background:rgba(255,255,255,.9);border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px">❤️</span><span style="opacity:.9">${gv("Strings","likes-label",m) ?? ""}</span></div>
         </div>
       </div>`
     ).join("");
@@ -943,20 +943,21 @@ l10n: {
     { name:"user-name", type:"STRING", values:{ EN:"Neil", DE:"Neil", FR:"Neil" } },
     { name:"count", type:"FLOAT", values:{ EN:3, DE:3, FR:1 } },
     { name:"welcome", type:"STRING", values:{}, description:'{{ "$greeting, $user-name" + "!" }}' },
-    { name:"items-label", type:"STRING", values:{}, description:'{{ "$count " + ($count === 1 ? ["item","Artikel","article"][$$.modeIndex] : ["items","Artikel","articles"][$$.modeIndex]) }}' },
+    { name:"likes-label", type:"STRING", values:{}, description:`{{ "$count " + ($count === 1 ? ["like","Like","j'aime"][$$.modeIndex] : ["likes","Likes","j'aime"][$$.modeIndex]) }}` },
   ]}}}},
 weather: {
   title: "Live: feels-like temperature, any city — throttled",
   hint: "Type a city, flip the °F switch, click Run. The trick: feels-like reads its OWN previous value ($$.values[$$.modeIndex]) and only re-fetches when the minute stamp from $updated has expired — the API is hit at most once a minute even under continuous monitoring.",
   manual: true,
   preview: gv => {
-    const t = String(gv("Live","feels-like") ?? "");
-    const ran = /°/.test(t);
-    const [temp, stamp] = ran ? t.split(" · ") : ["–°", ""];
+    // honest card: every line is a variable value, verbatim —
+    // $city, $temperature (derived from $feels-like) and $updated
+    const temp = String(gv("Live","temperature") ?? "");
+    const ran = /°/.test(temp);
     return `<div style="width:100%;background:linear-gradient(160deg,#4A90D9,#7CB9F2);border-radius:12px;padding:14px;color:#fff">
       <div style="font:600 12px Inter;opacity:.9">${esc(gv("Live","city") || "")}</div>
-      <div style="font:600 30px Inter;line-height:1.2">${esc(temp)}</div>
-      <div style="font:11px Inter;opacity:.85">${ran ? "feels like · updated " + esc(stamp || "") : "click Run it"}</div>
+      <div style="font:600 30px Inter;line-height:1.2">${ran ? esc(temp) : "–°"}</div>
+      <div style="font:11px Inter;opacity:.85">${ran ? "feels like · updated " + esc(gv("Live","updated") || "") : "click Run it"}</div>
     </div>`;
   },
   model: { collections: { "Live": { modes:["Value"], vars:[
@@ -965,6 +966,8 @@ weather: {
     { name:"updated", type:"STRING", values:{ Value:"" }, description:D('new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })') },
     { name:"feels-like", type:"STRING", values:{ Value:"— click Run —" }, editable:false,
       description:"{{\nconst cached = String($$.values[$$.modeIndex]);\ncached.endsWith(\"\u00b7 \" + \"$updated\")\n  ? cached\n  : fetch(\"https://geocoding-api.open-meteo.com/v1/search?count=1&name=\" + encodeURIComponent(\"$city\"))\n      .then(r => r.json())\n      .then(g => fetch(\"https://api.open-meteo.com/v1/forecast?current=apparent_temperature\"\n        + \"&latitude=\" + g.results[0].latitude + \"&longitude=\" + g.results[0].longitude\n        + \"&temperature_unit=\" + ($use-fahrenheit ? \"fahrenheit\" : \"celsius\")))\n      .then(r => r.json())\n      .then(d => Math.round(d.current.apparent_temperature) + ($use-fahrenheit ? \"\u00b0F\" : \"\u00b0C\") + \" \u00b7 \" + \"$updated\");\n}}" },
+    { name:"temperature", type:"STRING", values:{ Value:"—" }, editable:false,
+      description:D('String("$feels-like").split(" · ")[0]') },
   ]}}}},
 };
 

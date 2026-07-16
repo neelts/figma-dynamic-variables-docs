@@ -239,8 +239,8 @@ greedy: `$user-name!` reads as a variable named `user-name!`):
 
 ```js
 welcome     → {{ "$greeting, $user-name" + "!" }}     // Hello, Neil! / Hallo, Neil! / Bonjour, Neil!
-items-label → {{ "$count " + ($count === 1 ? ["item","Artikel","article"][$$.modeIndex]
-                                             : ["items","Artikel","articles"][$$.modeIndex]) }}
+likes-label → {{ "$count " + ($count === 1 ? ["like","Like","j'aime"][$$.modeIndex]
+                                             : ["likes","Likes","j'aime"][$$.modeIndex]) }}
 ```
 
 ### Live data — weather, prices, time (throttled)
@@ -274,7 +274,11 @@ feels-like → {{
 ```
 
 The result reads like `92°F · 14:03` — the stamp doubles as an honest
-"updated at" label.
+"updated at" label, and a small derivation splits the display value back out:
+
+```js
+temperature → {{ String("$feels-like").split(" · ")[0] }}   // "92°F"
+```
 
 Multi-statement expressions read top-to-bottom: set up locals with `const`,
 and the **last statement** is the variable's value (a trailing semicolon is
