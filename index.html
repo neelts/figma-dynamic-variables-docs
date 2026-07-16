@@ -933,7 +933,7 @@ l10n: {
         <div style="font-size:16px;line-height:1">${flags[m]}</div>
         <div style="flex:1;background:linear-gradient(160deg,#4A90D9,#7CB9F2);color:#fff;border-radius:12px 12px 12px 3px;padding:8px 11px">
           <div style="font:600 12px Inter">${gv("Strings","welcome",m) ?? ""}</div>
-          <div style="display:flex;align-items:center;gap:5px;font:11px Inter;margin-top:2px"><span style="background:rgba(255,255,255,.9);border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px">❤️</span><span style="opacity:.9">${gv("Strings","likes-label",m) ?? ""}</span></div>
+          <div style="display:flex;align-items:center;gap:5px;font:11px Inter;margin-top:2px"><span style="font-size:12px">❤️</span><span style="opacity:.9">${gv("Strings","likes-label",m) ?? ""}</span></div>
         </div>
       </div>`
     ).join("");
@@ -949,25 +949,21 @@ weather: {
   title: "Live: feels-like temperature, any city — throttled",
   hint: "Type a city, flip the °F switch, click Run. The trick: feels-like reads its OWN previous value ($$.values[$$.modeIndex]) and only re-fetches when the minute stamp from $updated has expired — the API is hit at most once a minute even under continuous monitoring.",
   manual: true,
-  preview: gv => {
-    // honest card: every line is a variable value, verbatim —
-    // $city, $temperature (derived from $feels-like) and $updated
-    const temp = String(gv("Live","temperature") ?? "");
-    const ran = /°/.test(temp);
-    return `<div style="width:100%;background:linear-gradient(160deg,#4A90D9,#7CB9F2);border-radius:12px;padding:14px;color:#fff">
-      <div style="font:600 12px Inter;opacity:.9">${esc(gv("Live","city") || "")}</div>
-      <div style="font:600 30px Inter;line-height:1.2">${ran ? esc(temp) : "–°"}</div>
-      <div style="font:11px Inter;opacity:.85">${ran ? "feels like · updated " + esc(gv("Live","updated") || "") : "click Run it"}</div>
-    </div>`;
-  },
+  preview: gv => `<div style="width:100%;background:linear-gradient(160deg,#4A90D9,#7CB9F2);border-radius:12px;padding:14px;color:#fff">
+      <div style="font:600 12px Inter;opacity:.9">${esc(gv("Live","city") ?? "")}</div>
+      <div style="font:600 30px Inter;line-height:1.2">${esc(gv("Live","temperature") ?? "")}</div>
+      <div style="font:11px Inter;opacity:.85">${esc(gv("Live","caption") ?? "")}</div>
+    </div>`,
   model: { collections: { "Live": { modes:["Value"], vars:[
     { name:"city", type:"STRING", values:{ Value:"New York" } },
     { name:"use-fahrenheit", type:"BOOLEAN", values:{ Value:true } },
     { name:"updated", type:"STRING", values:{ Value:"" }, description:D('new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })') },
     { name:"feels-like", type:"STRING", values:{ Value:"— click Run —" }, editable:false,
       description:"{{\nconst cached = String($$.values[$$.modeIndex]);\ncached.endsWith(\"\u00b7 \" + \"$updated\")\n  ? cached\n  : fetch(\"https://geocoding-api.open-meteo.com/v1/search?count=1&name=\" + encodeURIComponent(\"$city\"))\n      .then(r => r.json())\n      .then(g => fetch(\"https://api.open-meteo.com/v1/forecast?current=apparent_temperature\"\n        + \"&latitude=\" + g.results[0].latitude + \"&longitude=\" + g.results[0].longitude\n        + \"&temperature_unit=\" + ($use-fahrenheit ? \"fahrenheit\" : \"celsius\")))\n      .then(r => r.json())\n      .then(d => Math.round(d.current.apparent_temperature) + ($use-fahrenheit ? \"\u00b0F\" : \"\u00b0C\") + \" \u00b7 \" + \"$updated\");\n}}" },
-    { name:"temperature", type:"STRING", values:{ Value:"—" }, editable:false,
+    { name:"temperature", type:"STRING", values:{ Value:"–°" }, editable:false,
       description:D('String("$feels-like").split(" · ")[0]') },
+    { name:"caption", type:"STRING", values:{ Value:"click Run it" }, editable:false,
+      description:D('"feels like · updated $updated"') },
   ]}}}},
 };
 

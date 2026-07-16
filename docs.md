@@ -278,6 +278,7 @@ The result reads like `92°F · 14:03` — the stamp doubles as an honest
 
 ```js
 temperature → {{ String("$feels-like").split(" · ")[0] }}   // "92°F"
+caption     → {{ "feels like · updated $updated" }}         // for the card's footer
 ```
 
 Multi-statement expressions read top-to-bottom: set up locals with `const`,
