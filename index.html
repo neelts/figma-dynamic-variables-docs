@@ -744,7 +744,7 @@ function mount(root, ex){
       const [id, m, kind] = JSON.parse(inp.dataset.base);
       const v = findById(id);
       v.values[m] = kind==="number" ? parseFloat(inp.value||"0") : inp.value;
-      if (!ex.manual) reval(300);
+      reval(ex.manual ? 500 : 300);
     });
   });
   root.querySelectorAll("[data-bool]").forEach(btn=>{
@@ -755,7 +755,7 @@ function mount(root, ex){
       btn.classList.toggle("on", v.values[m]);
       btn.setAttribute("aria-checked", String(v.values[m]));
       btn.nextElementSibling.textContent = String(v.values[m]);
-      if (!ex.manual) reval(150);
+      reval(150);
     });
   });
   root.querySelectorAll("[data-rename]").forEach(inp=>{
@@ -956,7 +956,7 @@ l10n: {
   ]}}}},
 weather: {
   title: "Live: feels-like temperature, any city — throttled",
-  hint: "Type a city, flip the °F switch, click Run. The trick: feels-like reads its OWN previous value ($$.values[$$.modeIndex]) and re-fetches only when the stamp — city, unit and the minute clock from $updated — no longer matches. Editing an input refreshes immediately; an unchanged setup hits the API at most once a minute even under continuous monitoring.",
+  hint: "Type a city or flip the °F switch — it re-runs by itself. The trick: feels-like reads its OWN previous value ($$.values[$$.modeIndex]) and re-fetches only when the stamp — city, unit and the minute clock from $updated — no longer matches. Editing an input refreshes immediately; an unchanged setup hits the API at most once a minute even under continuous monitoring.",
   manual: true,
   preview: gv => `<div style="width:100%;background:linear-gradient(160deg,#4A90D9,#7CB9F2);border-radius:12px;padding:14px;color:#fff">
       <div style="font:600 12px Inter;opacity:.9">${esc(gv("Live","city") ?? "")}</div>
@@ -967,11 +967,11 @@ weather: {
     { name:"city", type:"STRING", values:{ Value:"New York" } },
     { name:"use-fahrenheit", type:"BOOLEAN", values:{ Value:true } },
     { name:"updated", type:"STRING", values:{ Value:"" }, description:D('new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })') },
-    { name:"feels-like", type:"STRING", values:{ Value:"— click Run —" }, editable:false,
+    { name:"feels-like", type:"STRING", values:{ Value:"— not fetched yet —" }, editable:false,
       description:"{{\nconst suffix = $use-fahrenheit ? \"°F\" : \"°C\";\nconst stamp = \" · \" + \"$city\" + \" · \" + \"$updated\";\nconst cached = String($$.values[$$.modeIndex]);\ncached.endsWith(stamp) && cached.split(\" · \")[0].endsWith(suffix)\n  ? cached\n  : fetch(\"https://geocoding-api.open-meteo.com/v1/search?count=1&name=\" + encodeURIComponent(\"$city\"))\n      .then(r => r.json())\n      .then(g => fetch(\"https://api.open-meteo.com/v1/forecast?current=apparent_temperature\"\n        + \"&latitude=\" + g.results[0].latitude + \"&longitude=\" + g.results[0].longitude\n        + \"&temperature_unit=\" + ($use-fahrenheit ? \"fahrenheit\" : \"celsius\")))\n      .then(r => r.json())\n      .then(d => Math.round(d.current.apparent_temperature) + suffix + stamp);\n}}" },
     { name:"temperature", type:"STRING", values:{ Value:"–°" }, editable:false,
       description:D('String("$feels-like").split(" · ")[0]') },
-    { name:"caption", type:"STRING", values:{ Value:"click Run it" }, editable:false,
+    { name:"caption", type:"STRING", values:{ Value:"edit a variable or click Run it" }, editable:false,
       description:D('"feels like · updated $updated"') },
   ]}}}},
 };
