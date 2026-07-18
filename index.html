@@ -224,6 +224,16 @@ tr.exprrow td{padding:2px 8px 8px;border-bottom:1px solid var(--figma-color-bord
 <p>Expressions can <code>fetch</code>. This pulls the current feels-like temperature in NYC from Open-Meteo (no API key) into a variable:</p>
 <div class="play" data-example="weather"></div>
 
+<h3>8. Motion variables (Timing &amp; Easing) — select, don't compute</h3>
+<p>Figma's new Timing and Easing variable types are <strong>read-only for plugins</strong>: the Plugin API rejects every attempt to create one or write a value into one. The single exception — which this plugin turns into a feature — is that a motion variable may be <strong>aliased to another variable of the same type</strong>. So an expression on a Timing or Easing variable doesn't return a value; it returns the <strong>name</strong> of the variable it should follow:</p>
+<pre><code>// on Motion/duration (a TIMING variable):
+{{ $reduced-motion ? "slow" : "fast" }}          // same-collection names
+
+// on Motion/active-curve (an EASING variable):
+{{ $reduced-motion ? "Motion/Hold" : "Motion/Bouncy" }}</code></pre>
+<p>Flip the <code>reduced-motion</code> boolean and every animation bound to <code>active-curve</code> switches to Hold — an accessibility toggle for your whole motion system, or brand-level motion personalities from one driver.</p>
+<p class="dim">⚠️ <strong>Use with care.</strong> Because raw writes are blocked, the plugin can re-point a motion variable but can <strong>never write its original value back</strong> — undoing an alias means re-picking the curve in Figma's own panel (or Cmd/Ctrl+Z right after). Keep your source curves in dedicated preset variables (like <code>Hold</code> and <code>Bouncy</code> above) and put expressions only on <em>selector</em> variables that were born to be aliases. If Figma later opens raw writes, computed values start working here by themselves — the plugin probes the API on every write.</p>
+
 <p class="dim">🧳 Coming from Tokens Studio or another token pipeline? The recipes above are your parity bridge — and code <code>MIGRATING</code> at <a href="https://neelts.lemonsqueezy.com/buy/7753e037-3c90-404f-8cbb-508ba5bfc2eb?checkout[discount_code]=MIGRATING" target="_blank" rel="noopener">checkout</a> acknowledges that switching takes work.</p>
 
 <h2 id="ai">AI editing — describe it, don't code it <span class="pill">2.0</span></h2>

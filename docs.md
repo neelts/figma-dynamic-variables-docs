@@ -291,6 +291,36 @@ fine). `return` works inside the arrow bodies — it's only a *top-level*
 
 …or simply `{{ new Date().toLocaleTimeString("en-GB") }}`.
 
+### Motion variables (Timing & Easing) — select, don't compute
+
+Figma's new Timing and Easing variable types are **read-only for plugins**:
+the Plugin API rejects every attempt to create one or write a value into
+one. The single exception — which this plugin turns into a feature — is
+that a motion variable may be **aliased to another variable of the same
+type**. So an expression on a Timing or Easing variable doesn't return a
+value; it returns the **name** of the variable it should follow:
+
+```js
+// on Motion/duration (a TIMING variable):
+{{ $reduced-motion ? "slow" : "fast" }}          // same-collection names
+
+// on Motion/active-curve (an EASING variable):
+{{ $reduced-motion ? "Motion/Hold" : "Motion/Bouncy" }}
+```
+
+Flip the `reduced-motion` boolean and every animation bound to
+`active-curve` switches to Hold — an accessibility toggle for your whole
+motion system, or brand-level motion personalities from one driver.
+
+> ⚠️ **Use with care.** Because raw writes are blocked, the plugin can
+> re-point a motion variable but can **never write its original value
+> back** — undoing an alias means re-picking the curve in Figma's own
+> panel (or Cmd/Ctrl+Z right after). Keep your source curves in dedicated
+> preset variables (like `Hold` and `Bouncy` above) and put expressions
+> only on *selector* variables that were born to be aliases. If Figma
+> later opens raw writes, computed values start working here by
+> themselves — the plugin probes the API on every write.
+
 ---
 
 🧳 Coming from Tokens Studio or another token pipeline? The recipes above
