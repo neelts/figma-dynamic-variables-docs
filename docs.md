@@ -306,11 +306,17 @@ value; it returns the **name** of the variable it should follow:
 
 // on Motion/active-curve (an EASING variable):
 {{ $reduced-motion ? "Motion/Hold" : "Motion/Bouncy" }}
+
+// the explicit spelling — alias() works on EVERY variable type:
+{{ alias($use-brand-b ? "Theme/brand-b" : "Theme/brand-a") }}   // e.g. on a COLOR
 ```
 
 Flip the `reduced-motion` boolean and every animation bound to
 `active-curve` switches to Hold — an accessibility toggle for your whole
-motion system, or brand-level motion personalities from one driver.
+motion system, or brand-level motion personalities from one driver. And
+since `alias()` writes a real Figma alias for any same-type pair, the
+same trick switches colors, numbers or strings by reference instead of
+copying values.
 
 > ⚠️ **Use with care.** Because raw writes are blocked, the plugin can
 > re-point a motion variable but can **never write its original value
