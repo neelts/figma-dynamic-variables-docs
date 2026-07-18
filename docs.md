@@ -123,6 +123,9 @@ share one expression that reads its own step from its name:
 | `fn` | Number/date formatting (Intl) | `fn($price, "en-US", {style:"currency", currency:"USD"})` |
 | `cdRandom`, `cdGetFormat` | colord extras | `cdRandom().toHex()` |
 | `alias` | Alias this variable to another **same-type** variable (a real Figma alias — and the only valid write for Timing/Easing) | `alias($dark ? "Theme/night" : "Theme/day")` |
+| `cssEasing` | Easing value → CSS string (`cubic-bezier(…)`, `linear`, `steps(1, end)`, `spring(bounce)`) | `cssEasing($('Motion/curve'))` |
+| `easingName` | Easing value → Figma's own label | `easingName($('Motion/curve'))` → `"Bouncy"` |
+| `bounce` | Easing spring value → normalized bounce (0..1) | `bounce($('Motion/spring'))` → `0.99` |
 
 ---
 
@@ -318,6 +321,15 @@ motion system, or brand-level motion personalities from one driver. And
 since `alias()` writes a real Figma alias for any same-type pair, the
 same trick switches colors, numbers or strings by reference instead of
 copying values.
+
+Reading motion variables works too — turn them into live handoff tokens
+with the easing helpers (`cssEasing`, `easingName`, `bounce`):
+
+```js
+code/easing  → {{ cssEasing($('Motion/active-curve')) }}   // "cubic-bezier(0.42, 0, 0.58, 1)"
+motion-label → {{ easingName($('Motion/active-curve')) }}  // "Bouncy"
+code/timing  → {{ $('Motion/duration') + "ms" }}           // Timing values are plain numbers
+```
 
 > ⚠️ **Use with care.** Because raw writes are blocked, the plugin can
 > re-point a motion variable but can **never write its original value

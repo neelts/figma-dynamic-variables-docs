@@ -235,6 +235,10 @@ tr.exprrow td{padding:2px 8px 8px;border-bottom:1px solid var(--figma-color-bord
 // the explicit spelling — alias() works on EVERY variable type:
 {{ alias($use-brand-b ? "Theme/brand-b" : "Theme/brand-a") }}   // e.g. on a COLOR</code></pre>
 <p>Flip the <code>reduced-motion</code> boolean and every animation bound to <code>active-curve</code> switches to Hold — an accessibility toggle for your whole motion system, or brand-level motion personalities from one driver. And since <code>alias()</code> writes a real Figma alias for any same-type pair, the same trick switches colors, numbers or strings by reference instead of copying values.</p>
+<p>Reading motion variables works too — turn them into live handoff tokens with the easing helpers (<code>cssEasing</code>, <code>easingName</code>, <code>bounce</code>):</p>
+<pre><code>code/easing  → {{ cssEasing($('Motion/active-curve')) }}   // "cubic-bezier(0.42, 0, 0.58, 1)"
+motion-label → {{ easingName($('Motion/active-curve')) }}  // "Bouncy"
+code/timing  → {{ $('Motion/duration') + "ms" }}           // Timing values are plain numbers</code></pre>
 <p class="dim">⚠️ <strong>Use with care.</strong> Because raw writes are blocked, the plugin can re-point a motion variable but can <strong>never write its original value back</strong> — undoing an alias means re-picking the curve in Figma's own panel (or Cmd/Ctrl+Z right after). Keep your source curves in dedicated preset variables (like <code>Hold</code> and <code>Bouncy</code> above) and put expressions only on <em>selector</em> variables that were born to be aliases. If Figma later opens raw writes, computed values start working here by themselves — the plugin probes the API on every write.</p>
 
 <p class="dim">🧳 Coming from Tokens Studio or another token pipeline? The recipes above are your parity bridge — and code <code>MIGRATING</code> at <a href="https://neelts.lemonsqueezy.com/buy/7753e037-3c90-404f-8cbb-508ba5bfc2eb?checkout[discount_code]=MIGRATING" target="_blank" rel="noopener">checkout</a> acknowledges that switching takes work.</p>
@@ -305,6 +309,9 @@ tr.exprrow td{padding:2px 8px 8px;border-bottom:1px solid var(--figma-color-bord
 <tr><td><code>fn</code></td><td>Number/date formatting (Intl)</td><td><code>fn($price, "en-US", {style:"currency", currency:"USD"})</code></td></tr>
 <tr><td><code>cdRandom</code>, <code>cdGetFormat</code></td><td>colord extras</td><td><code>cdRandom().toHex()</code></td></tr>
 <tr><td><code>alias</code></td><td>Alias this variable to another <strong>same-type</strong> variable (a real Figma alias — and the only valid write for Timing/Easing)</td><td><code>alias($dark ? "Theme/night" : "Theme/day")</code></td></tr>
+<tr><td><code>cssEasing</code></td><td>Easing value → CSS string (<code>cubic-bezier(…)</code>, <code>linear</code>, <code>steps(1, end)</code>, <code>spring(bounce)</code>)</td><td><code>cssEasing($('Motion/curve'))</code></td></tr>
+<tr><td><code>easingName</code></td><td>Easing value → Figma's own label</td><td><code>easingName($('Motion/curve'))</code> → <code>"Bouncy"</code></td></tr>
+<tr><td><code>bounce</code></td><td>Easing spring value → normalized bounce (0..1)</td><td><code>bounce($('Motion/spring'))</code> → <code>0.99</code></td></tr>
 </table>
 
 <h3>Global Functions</h3>
