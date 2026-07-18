@@ -122,6 +122,7 @@ share one expression that reads its own step from its name:
 | `rgba` | Figma-style CSS color parser → `{r,g,b,a}` | `rgba("green")` |
 | `fn` | Number/date formatting (Intl) | `fn($price, "en-US", {style:"currency", currency:"USD"})` |
 | `cdRandom`, `cdGetFormat` | colord extras | `cdRandom().toHex()` |
+| `alias` | Alias this variable to another **same-type** variable (a real Figma alias — and the only valid write for Timing/Easing) | `alias($dark ? "Theme/night" : "Theme/day")` |
 
 ---
 
