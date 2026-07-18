@@ -250,8 +250,10 @@ variables — a `city` STRING and a `use-fahrenheit` BOOLEAN — drive a
 geocoding fetch that feeds a weather fetch. And because monitoring
 re-evaluates every tick, the expression throttles itself: it reads its OWN
 previous value (`$$.values[$$.modeIndex]` — the self metadata array indexed
-by the numeric mode index) and only re-fetches when the minute stamp from a
-small clock variable has expired:
+by the numeric mode index) and only re-fetches when the stamp no longer
+matches. The stamp bakes in the *inputs* plus a minute clock, so editing the
+city or flipping the unit re-fetches immediately, while an unchanged setup
+waits out the minute:
 
 ```js
 updated → {{ new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) }}
@@ -259,22 +261,23 @@ updated → {{ new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute:
 
 ```js
 feels-like → {{
+  const suffix = $use-fahrenheit ? "°F" : "°C";
+  const stamp = " · " + "$city" + " · " + "$updated";
   const cached = String($$.values[$$.modeIndex]);
-  cached.endsWith("· " + "$updated")
-    ? cached                                  // same minute — keep it, no API call
+  cached.endsWith(stamp) && cached.split(" · ")[0].endsWith(suffix)
+    ? cached                     // same city, same unit, same minute — no API call
     : fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&name=" + encodeURIComponent("$city"))
         .then(r => r.json())
         .then(g => fetch("https://api.open-meteo.com/v1/forecast?current=apparent_temperature"
           + "&latitude=" + g.results[0].latitude + "&longitude=" + g.results[0].longitude
           + "&temperature_unit=" + ($use-fahrenheit ? "fahrenheit" : "celsius")))
         .then(r => r.json())
-        .then(d => Math.round(d.current.apparent_temperature)
-          + ($use-fahrenheit ? "°F" : "°C") + " · " + "$updated");
+        .then(d => Math.round(d.current.apparent_temperature) + suffix + stamp);
 }}
 ```
 
-The result reads like `92°F · 14:03` — the stamp doubles as an honest
-"updated at" label, and a small derivation splits the display value back out:
+The result reads like `92°F · New York · 14:03` — the stamp doubles as an
+honest cache key, and a small derivation splits the display value back out:
 
 ```js
 temperature → {{ String("$feels-like").split(" · ")[0] }}   // "92°F"
