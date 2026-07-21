@@ -67,28 +67,34 @@ expression.
 
 ---
 
-## Variable metadata — `$$`
+## Variable metadata — `$$()`
 
-`$$.prop` reads the *current* variable's own metadata; `$$('other.prop')`
-reads another variable's.
+`$$()` is the *current* variable's own metadata; `$$('other')` /
+`$$('Coll/other')` another variable's. Either way you get a **plain object**,
+so everything after it is ordinary JavaScript:
 
-Available props: `name`, `id`, `type`, `alias`, `collection`, `collectionId`,
-`mode`, `modeIndex`, `modeId`, `modes` (array of mode names), `values`
-(array of the variable's values, ordered by mode).
+```js
+{{ $$().mode === 'Dark' ? … : … }}
+{{ $$('Brand/seed').values[0] }}
+{{ `${$$().name} — ${cd($('Brand/primary')).toHex()}` }}
+```
 
-> ⚠️ **The one rule people trip on:** metadata substitutes as raw **text**
-> before your code runs. String props must be quoted *by you*:
->
-> - `'$$.name'.split('/')[1]` ✓
-> - `'$$.mode' === 'Dark'` ✓
-> - `$$.mode === 'Dark'` ✗ — after substitution this reads `Light === 'Dark'`, an error.
+Props on the object: `name`, `id`, `type`, `alias`, `collection`,
+`collectionId`, `mode`, `modeIndex`, `modeId`, `modes` (array of mode names),
+`values` (array of the variable's values, ordered by mode). Names with
+slashes, spaces or dots all work, and the path may be computed —
+`$$('ramp/' + i).name`.
 
 This is what makes **name-generic expressions** possible: a whole scale can
 share one expression that reads its own step from its name:
 
 ```js
-{{ const step = Number('$$.name'.split('-')[1]); Math.round($base * Math.pow($ratio, step)) }}
+{{ const step = Number($$().name.split('-')[1]); Math.round($base * Math.pow($ratio, step)) }}
 ```
+
+> **Legacy form.** 1.x metadata was substituted as raw *text* — `'$$.name'`,
+> `'$$.mode' === 'Dark'` (quotes supplied by you). Existing expressions keep
+> evaluating exactly as before; write new ones with `$$()`.
 
 ---
 
@@ -98,8 +104,8 @@ share one expression that reads its own step from its name:
   `{{ const t = $a * 2; Math.round(t) }}`. A top-level `return` is a syntax
   error (wrap in an IIFE if you want one).
 - **Computed reference paths** resolve *before* the expression body runs.
-  Build them only from literals and `$$` text —
-  `$('ramp/' + '$$.name'.split('-')[1])` ✓ — never from a `const` declared in
+  Build them only from literals and `$$()` metadata —
+  `$('ramp/' + $$().name.split('-')[1])` ✓ — never from a `const` declared in
   the same expression.
 - **String values splice as raw text** — use them inside string literals
   (`"$greeting, $user-name" + "!"`), punctuation outside the reference.
@@ -189,7 +195,7 @@ function rampStep(seed, name) {
 
 ```js
 // every ramp step
-{{ rampStep($seed, '$$.name') }}
+{{ rampStep($seed, $$().name) }}
 ```
 
 ### Spacing scale with density modes
@@ -230,7 +236,7 @@ inverting OKLCH lightness and damping chroma:
   const light = $('Source/surface');
   const src = cl.oklch(cv(light));
   const dark = { mode: 'oklch', l: 1 - src.l, c: src.c * 0.6, h: src.h };
-  '$$.mode' === 'Dark' ? cl.formatHex(cl.clampRgb(cl.rgb(dark))) : light;
+  $$().mode === 'Dark' ? cl.formatHex(cl.clampRgb(cl.rgb(dark))) : light;
 }}
 ```
 
@@ -243,8 +249,8 @@ greedy: `$user-name!` reads as a variable named `user-name!`):
 
 ```js
 welcome     → {{ "$greeting, $user-name" + "!" }}     // Hello, Neil! / Hallo, Neil! / Bonjour, Neil!
-likes-label → {{ "$count " + ($count === 1 ? ["like","Like","j'aime"][$$.modeIndex]
-                                             : ["likes","Likes","j'aime"][$$.modeIndex]) }}
+likes-label → {{ "$count " + ($count === 1 ? ["like","Like","j'aime"][$$().modeIndex]
+                                             : ["likes","Likes","j'aime"][$$().modeIndex]) }}
 ```
 
 ### Live data — weather, prices, time (throttled)
@@ -253,7 +259,7 @@ Expressions can `fetch`; the plugin awaits the Promise. Two hand-set
 variables — a `city` STRING and a `use-fahrenheit` BOOLEAN — drive a
 geocoding fetch that feeds a weather fetch. And because monitoring
 re-evaluates every tick, the expression throttles itself: it reads its OWN
-previous value (`$$.values[$$.modeIndex]` — the self metadata array indexed
+previous value (`$$.values[$$().modeIndex]` — the self metadata array indexed
 by the numeric mode index) and only re-fetches when the stamp no longer
 matches. The stamp bakes in the *inputs* plus a minute clock, so editing the
 city or flipping the unit re-fetches immediately, while an unchanged setup
@@ -267,7 +273,7 @@ updated → {{ new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute:
 feels-like → {{
   const suffix = $use-fahrenheit ? "°F" : "°C";
   const stamp = " · " + "$city" + " · " + "$updated";
-  const cached = String($$.values[$$.modeIndex]);
+  const cached = String($$().values[$$().modeIndex]);
   cached.endsWith(stamp) && cached.split(" · ")[0].endsWith(suffix)
     ? cached                     // same city, same unit, same minute — no API call
     : fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&name=" + encodeURIComponent("$city"))
@@ -404,7 +410,7 @@ Yes — culori (`cl`, `cv`) covers every CSS color space, plus gamut clamping
 `Math.round(x)`, `x.toFixed(2)`, or locale-aware `fn(x, "en-US")`.
 
 **Can an expression react to its mode?**
-`{{ '$$.mode' === 'Dark' ? … : … }}` (mind the quotes) — though plain
+`{{ $$().mode === 'Dark' ? … : … }}` — though plain
 references already resolve per-mode, which is usually all you need.
 
 **Will the plugin change variables I didn't write expressions for?**

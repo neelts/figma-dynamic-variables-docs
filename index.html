@@ -213,7 +213,7 @@ tr.exprrow td{padding:2px 8px 8px;border-bottom:1px solid var(--figma-color-bord
 <div class="play" data-example="oncolor"></div>
 
 <h3>5. Dark mode, derived from light</h3>
-<p>Author the Light palette; Dark computes itself by inverting OKLCH lightness and damping chroma. One expression, both modes — <code>$$.mode</code> tells it where it's running (note the quotes: <code>'$$.mode'</code>).</p>
+<p>Author the Light palette; Dark computes itself by inverting OKLCH lightness and damping chroma. One expression, both modes — <code>$$().mode</code> tells it where it's running.</p>
 <div class="play" data-example="dark"></div>
 
 <h3>6. Localization — languages as modes</h3>
@@ -285,14 +285,14 @@ code/timing  → {{ $('Motion/duration') + "ms" }}           // Timing values ar
 </table>
 <p class="dim">A plain reference always resolves to the value <em>for the current mode</em> — in a Light/Dark collection, one expression automatically reads the same-mode value. Legacy raw forms like <code>$Collection/name</code> from 1.x still work; the quoted call form is recommended because it never gets misread inside larger expressions.</p>
 
-<h3>Variable metadata — <code>$$</code></h3>
-<p><code>$$.prop</code> is the <em>current</em> variable's own metadata; <code>$$('other.prop')</code> reads another variable's. Available props: <code>name</code>, <code>id</code>, <code>type</code>, <code>alias</code>, <code>collection</code>, <code>collectionId</code>, <code>mode</code>, <code>modeIndex</code>, <code>modeId</code>, <code>modes</code> (array of mode names), <code>values</code> (array of the variable's values, ordered by mode).</p>
-<div class="note"><strong>The one rule people trip on:</strong> metadata substitutes as raw <em>text</em> before your code runs. String props must be quoted by <em>you</em>: <code>'$$.name'.split('/')[1]</code> ✓ &nbsp; <code>'$$.mode' === 'Dark'</code> ✓ &nbsp; bare <code>$$.mode === 'Dark'</code> ✗ (after substitution that reads <code>Light === 'Dark'</code> — an error).</div>
+<h3>Variable metadata — <code>$$()</code></h3>
+<p><code>$$()</code> is the <em>current</em> variable's own metadata; <code>$$('other')</code> / <code>$$('Coll/other')</code> another variable's. Either way you get a <strong>plain object</strong>, so everything after it is ordinary JavaScript: <code>$$().mode === 'Dark' ? … : …</code>, <code>$$('Brand/seed').values[0]</code>, <code>`${$$().name}`</code> in a template. Props: <code>name</code>, <code>id</code>, <code>type</code>, <code>alias</code>, <code>collection</code>, <code>collectionId</code>, <code>mode</code>, <code>modeIndex</code>, <code>modeId</code>, <code>modes</code> (array of mode names), <code>values</code> (array of the variable's values, ordered by mode). Names with slashes, spaces or dots all work, and the path may be computed — <code>$$('ramp/' + i).name</code>.</p>
+<div class="note"><strong>Legacy form.</strong> 1.x metadata substituted as raw <em>text</em> — <code>'$$.name'</code>, <code>'$$.mode' === 'Dark'</code> (quotes supplied by you). Existing expressions keep evaluating exactly as before; write new ones with <code>$$()</code>.</div>
 
 <h3>Engine rules worth knowing</h3>
 <ul>
 <li><strong>Multi-statement expressions:</strong> the value is the <em>last statement</em> — <code>{{ const t = …; Math.round(t) }}</code>. A top-level <code>return</code> is a syntax error (use an IIFE if you want one).</li>
-<li><strong>Computed reference paths</strong> resolve <em>before</em> the body runs: build them from literals and <code>$$</code> text only — <code>$('ramp/' + '$$.name'.split('-')[1])</code> ✓; never from a <code>const</code> you declared in the same expression.</li>
+<li><strong>Computed reference paths</strong> resolve <em>before</em> the body runs: build them from literals and <code>$$()</code> metadata only — <code>$('ramp/' + $$().name.split('-')[1])</code> ✓; never from a <code>const</code> you declared in the same expression.</li>
 <li><strong>String values splice as raw text</strong> — use them inside string literals (<code>"$greeting, $user-name" + "!"</code>), and keep punctuation out of the reference (the name matcher is greedy).</li>
 <li><strong>Async is fine:</strong> if the expression's value is a Promise (e.g. a <code>fetch</code> chain), the plugin awaits it.</li>
 <li><strong>Colors</strong> can be returned as hex strings, <code>rgb()</code>/<code>hsl()</code> strings, colord instances, or Figma <code>{r,g,b,a}</code> objects — the plugin coerces. Bare CSS names need a parser: <code>rgba("green")</code> or <code>cd("green")</code>.</li>
@@ -315,7 +315,7 @@ code/timing  → {{ $('Motion/duration') + "ms" }}           // Timing values ar
 </table>
 
 <h3>Global Functions</h3>
-<p>Repeated logic across many expressions? Create a <strong>Global Functions</strong> collection in the editor and define plain JavaScript helpers once — like <code>rampStep()</code> in the ramp recipe above — then call them from any expression: <code>{{ rampStep($seed, '$$.name') }}</code>. Two things to remember: helper code is plain JS (no <code>$</code> references inside it — pass values in as arguments), and the <code>cd</code>/<code>cl</code> libraries are available inside helpers.</p>
+<p>Repeated logic across many expressions? Create a <strong>Global Functions</strong> collection in the editor and define plain JavaScript helpers once — like <code>rampStep()</code> in the ramp recipe above — then call them from any expression: <code>{{ rampStep($seed, $$().name) }}</code>. Two things to remember: helper code is plain JS (no <code>$</code> references inside it — pass values in as arguments), and the <code>cd</code>/<code>cl</code> libraries are available inside helpers.</p>
 
 <h3>Run modes, errors, housekeeping</h3>
 <ul>
@@ -330,7 +330,7 @@ code/timing  → {{ $('Motion/duration') + "ms" }}           // Timing values ar
 <p><strong>My variable names have spaces or emoji.</strong><br>Use the call form: <code>$('🎨 Brand Primary')</code>. The <code>$name</code> shorthand only works for simple names.</p>
 <p><strong>Can I do HSB / LCH / OKLCH?</strong><br>Yes — culori (<code>cl</code>, <code>cv</code>) handles every CSS color space including OKLCH, plus gamut clamping (<code>cl.clampRgb</code>) so out-of-range results stay displayable.</p>
 <p><strong>Numbers show too many decimals.</strong><br><code>Math.round(x)</code>, <code>x.toFixed(2)</code>, or locale-aware <code>fn(x, "en-US")</code>.</p>
-<p><strong>Can an expression react to the mode it's in?</strong><br>Yes: <code>{{ '$$.mode' === 'Dark' ? … : … }}</code> (mind the quotes) — though often you don't need it: plain references already resolve per-mode.</p>
+<p><strong>Can an expression react to the mode it's in?</strong><br>Yes: <code>{{ $$().mode === 'Dark' ? … : … }}</code> — though often you don't need it: plain references already resolve per-mode.</p>
 <p><strong>Does it work with team library variables?</strong><br>Yes, via aliases: bring a library variable into a local collection as an alias, then reference it like any local variable.</p>
 <p><strong>Can I use <code>window</code> / <code>document</code> / import npm packages?</strong><br>No — expressions run in Figma's plugin sandbox. You get standard JavaScript, <code>fetch</code>, and the bundled color/format libraries; shared helpers go in Global Functions.</p>
 <p><strong>Will the plugin change variables I didn't write expressions for?</strong><br>No. Only variables whose description contains <code>{{ }}</code> are touched — and AI-proposed changes always go through the preview first.</p>
@@ -523,7 +523,25 @@ function makeResolver(model, collName, curVar, modeName){
     if (!(prop in map)) throw new Error(`unknown $$ prop .${prop}`);
     return String(map[prop]);
   }
-  return { lookup, meta };
+  // $$('path') / $$() — splice the FULL metadata as a JS object literal, so
+  // property access after the parens is plain JavaScript (like the plugin).
+  function metaObject(path){
+    const self = path == null || path === "";
+    const [v, coll, cName, m] = self
+      ? [curVar, colls[collName], collName, modeName]
+      : (r => [r.v, r.coll, r.cName, r.mode])(lookup(path));
+    const vals = coll.modes.map(mm=>{
+      const st = state(v); const raw = st.out[mm] !== undefined ? st.out[mm] : v.values[mm];
+      return v.type==="COLOR" && typeof raw==="string" ? hexToFig(raw) : raw;
+    });
+    const obj = { name:v.name, id:"VariableID:demo", type:v.type, collection:cName,
+      collectionId:"CollectionID:demo", mode:m, modeId:"ModeID:"+m,
+      modeIndex: coll.modes.indexOf(m), modes: coll.modes, values: vals,
+      alias: { type:"VARIABLE_ALIAS", id:"VariableID:demo" } };
+    // space adjacent closing braces so the splice can't end the {{ }} block
+    return `(${JSON.stringify(obj).replace(/}(?=})/g, "} ")})`;
+  }
+  return { lookup, meta, metaObject };
 }
 
 function valToSource(val){
@@ -547,18 +565,17 @@ function substitute(expr, res){
         const close = expr.indexOf(")", end);
         if (end>0 && close>0){
           const inner = expr.slice(j+2, end);
-          if (dbl){
-            const dot = inner.lastIndexOf(".");
-            out += res.meta(dot>0?inner.slice(0,dot):inner, dot>0?inner.slice(dot+1):"name", false);
-          } else out += valToSource(res.lookup(inner).val);
+          if (dbl) out += res.metaObject(inner);      // $$('X') → metadata object
+          else out += valToSource(res.lookup(inner).val);
           i = close+1; continue;
         }
       }
       let depth=1, k=j+1;
       while (k<expr.length && depth>0){ if(expr[k]==="(")depth++; if(expr[k]===")")depth--; k++; }
       const innerSrc = substitute(expr.slice(j+1, k-1), res);
-      const path = (0,eval)(innerSrc);
-      out += dbl ? res.meta(path,"name",false) : valToSource(res.lookup(path).val);
+      const path = innerSrc.trim() === "" ? null : (0,eval)(innerSrc);
+      out += dbl ? res.metaObject(path)               // $$() / $$(computed) → metadata object
+                 : valToSource(res.lookup(path).val);
       i = k; continue;
     }
     if (dbl && expr[j] === "."){
@@ -882,11 +899,11 @@ ramp: {
     globalFunctions: RAMP_GF,
     collections: { "Brand": { modes:["Value"], vars:[
       { name:"seed", type:"COLOR", values:{ Value:"#6E56CF" } },
-      { name:"ramp-200", type:"COLOR", values:{}, description:D("rampStep($seed, '$$.name')") },
-      { name:"ramp-400", type:"COLOR", values:{}, description:D("rampStep($seed, '$$.name')") },
-      { name:"ramp-600", type:"COLOR", values:{}, description:D("rampStep($seed, '$$.name')") },
-      { name:"ramp-800", type:"COLOR", values:{}, description:D("rampStep($seed, '$$.name')") },
-      { name:"ramp-500", type:"COLOR", values:{}, editableName:true, description:D("rampStep($seed, '$$.name')") },
+      { name:"ramp-200", type:"COLOR", values:{}, description:D("rampStep($seed, $$().name)") },
+      { name:"ramp-400", type:"COLOR", values:{}, description:D("rampStep($seed, $$().name)") },
+      { name:"ramp-600", type:"COLOR", values:{}, description:D("rampStep($seed, $$().name)") },
+      { name:"ramp-800", type:"COLOR", values:{}, description:D("rampStep($seed, $$().name)") },
+      { name:"ramp-500", type:"COLOR", values:{}, editableName:true, description:D("rampStep($seed, $$().name)") },
     ]}}}},
 spacing: {
   title: "Density-aware spacing via relative refs",
@@ -936,7 +953,7 @@ oncolor: {
   ]}}}},
 dark: {
   title: "Dark derives from Light",
-  hint: "You author only the Source palette. Theme's Dark column inverts OKLCH lightness and damps chroma — note the quoted '$$.mode'.",
+  hint: "You author only the Source palette. Theme's Dark column inverts OKLCH lightness and damps chroma — $$().mode picks the branch.",
   preview: gv => ["Light","Dark"].map(m =>
     `<div style="width:100%;background:${gv("Theme","surface",m)};border:1px solid var(--figma-color-border);border-radius:9px;padding:10px 12px;display:flex;align-items:center;gap:8px">
       <div style="width:18px;height:18px;border-radius:50%;background:${gv("Theme","accent",m)}"></div>
@@ -949,13 +966,13 @@ dark: {
       { name:"accent", type:"COLOR", values:{ "Light values":"#C2540E" } },
     ]},
     "Theme": { modes:["Light","Dark"], vars:[
-      { name:"surface", type:"COLOR", values:{}, description:"{{\nconst light = $('Source/surface');\nconst src = cl.oklch(cv(light));\nconst dark = { mode: 'oklch', l: 1 - src.l, c: src.c * 0.6, h: src.h };\n'$$.mode' === 'Dark' ? cl.formatHex(cl.clampRgb(cl.rgb(dark))) : light;\n}}" },
-      { name:"accent", type:"COLOR", values:{}, description:"{{\nconst light = $('Source/accent');\nconst src = cl.oklch(cv(light));\nconst dark = { mode: 'oklch', l: 1 - src.l, c: src.c * 0.8, h: src.h };\n'$$.mode' === 'Dark' ? cl.formatHex(cl.clampRgb(cl.rgb(dark))) : light;\n}}" },
+      { name:"surface", type:"COLOR", values:{}, description:"{{\nconst light = $('Source/surface');\nconst src = cl.oklch(cv(light));\nconst dark = { mode: 'oklch', l: 1 - src.l, c: src.c * 0.6, h: src.h };\n$$().mode === 'Dark' ? cl.formatHex(cl.clampRgb(cl.rgb(dark))) : light;\n}}" },
+      { name:"accent", type:"COLOR", values:{}, description:"{{\nconst light = $('Source/accent');\nconst src = cl.oklch(cv(light));\nconst dark = { mode: 'oklch', l: 1 - src.l, c: src.c * 0.8, h: src.h };\n$$().mode === 'Dark' ? cl.formatHex(cl.clampRgb(cl.rgb(dark))) : light;\n}}" },
     ]},
   }}},
 l10n: {
   title: "Copy that translates itself",
-  hint: "Switch the values — welcome and likes-label recompose per language. Strings splice as raw text (built inside literals); the unit word is picked from a translated array by bare numeric $$.modeIndex.",
+  hint: "Switch the values — welcome and likes-label recompose per language. Strings splice as raw text (built inside literals); the unit word is picked from a translated array by the numeric $$().modeIndex.",
   preview: gv => {
     const flags = { EN: "🇬🇧", DE: "🇩🇪", FR: "🇫🇷" };
     return ["EN","DE","FR"].map(m =>
@@ -973,11 +990,11 @@ l10n: {
     { name:"user-name", type:"STRING", values:{ EN:"Neil", DE:"Neil", FR:"Neil" } },
     { name:"count", type:"FLOAT", values:{ EN:3, DE:3, FR:1 } },
     { name:"welcome", type:"STRING", values:{}, description:'{{ "$greeting, $user-name" + "!" }}' },
-    { name:"likes-label", type:"STRING", values:{}, description:`{{ "$count " + ($count === 1 ? ["like","Like","j'aime"][$$.modeIndex] : ["likes","Likes","j'aime"][$$.modeIndex]) }}` },
+    { name:"likes-label", type:"STRING", values:{}, description:`{{ "$count " + ($count === 1 ? ["like","Like","j'aime"][$$().modeIndex] : ["likes","Likes","j'aime"][$$().modeIndex]) }}` },
   ]}}}},
 weather: {
   title: "Live: feels-like temperature, any city — throttled",
-  hint: "Type a city or flip the °F switch — it re-runs by itself. The trick: feels-like reads its OWN previous value ($$.values[$$.modeIndex]) and re-fetches only when the stamp — city, unit and the minute clock from $updated — no longer matches. Editing an input refreshes immediately; an unchanged setup hits the API at most once a minute even under continuous monitoring.",
+  hint: "Type a city or flip the °F switch — it re-runs by itself. The trick: feels-like reads its OWN previous value ($$.values[$$().modeIndex]) and re-fetches only when the stamp — city, unit and the minute clock from $updated — no longer matches. Editing an input refreshes immediately; an unchanged setup hits the API at most once a minute even under continuous monitoring.",
   manual: true,
   preview: gv => `<div style="width:100%;background:linear-gradient(160deg,#4A90D9,#7CB9F2);border-radius:12px;padding:14px;color:#fff">
       <div style="font:600 12px Inter;opacity:.9">${esc(gv("Live","city") ?? "")}</div>
@@ -989,7 +1006,7 @@ weather: {
     { name:"use-fahrenheit", type:"BOOLEAN", values:{ Value:true } },
     { name:"updated", type:"STRING", values:{ Value:"" }, description:D('new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })') },
     { name:"feels-like", type:"STRING", values:{ Value:"— not fetched yet —" }, editable:false,
-      description:"{{\nconst suffix = $use-fahrenheit ? \"°F\" : \"°C\";\nconst stamp = \" · \" + \"$city\" + \" · \" + \"$updated\";\nconst cached = String($$.values[$$.modeIndex]);\ncached.endsWith(stamp) && cached.split(\" · \")[0].endsWith(suffix)\n  ? cached\n  : fetch(\"https://geocoding-api.open-meteo.com/v1/search?count=1&name=\" + encodeURIComponent(\"$city\"))\n      .then(r => r.json())\n      .then(g => fetch(\"https://api.open-meteo.com/v1/forecast?current=apparent_temperature\"\n        + \"&latitude=\" + g.results[0].latitude + \"&longitude=\" + g.results[0].longitude\n        + \"&temperature_unit=\" + ($use-fahrenheit ? \"fahrenheit\" : \"celsius\")))\n      .then(r => r.json())\n      .then(d => Math.round(d.current.apparent_temperature) + suffix + stamp);\n}}" },
+      description:"{{\nconst suffix = $use-fahrenheit ? \"°F\" : \"°C\";\nconst stamp = \" · \" + \"$city\" + \" · \" + \"$updated\";\nconst cached = String($$().values[$$().modeIndex]);\ncached.endsWith(stamp) && cached.split(\" · \")[0].endsWith(suffix)\n  ? cached\n  : fetch(\"https://geocoding-api.open-meteo.com/v1/search?count=1&name=\" + encodeURIComponent(\"$city\"))\n      .then(r => r.json())\n      .then(g => fetch(\"https://api.open-meteo.com/v1/forecast?current=apparent_temperature\"\n        + \"&latitude=\" + g.results[0].latitude + \"&longitude=\" + g.results[0].longitude\n        + \"&temperature_unit=\" + ($use-fahrenheit ? \"fahrenheit\" : \"celsius\")))\n      .then(r => r.json())\n      .then(d => Math.round(d.current.apparent_temperature) + suffix + stamp);\n}}" },
     { name:"temperature", type:"STRING", values:{ Value:"–°" }, editable:false,
       description:D('String("$feels-like").split(" · ")[0]') },
     { name:"caption", type:"STRING", values:{ Value:"edit a variable or click Run it" }, editable:false,
