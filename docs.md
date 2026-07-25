@@ -401,11 +401,13 @@ In the editor, the ✨ AI menu gives you a loop that works with
    badge and lands in the named collection). Nothing touches your file
    until you apply.
 
-**Models that do well** (from the plugin's own test harness — 20
-design-system scenarios): Claude Haiku 4.5, Codex and GPT-5-mini solve nearly
-everything; DeepSeek is a solid budget option. Small local models tend to
-produce invalid expressions — the preview catches them, but you'll have a
-better time with the tier above.
+**Which model?** Whatever you already use. In the plugin's own test
+harness (20 design-system scenarios), assistants from the major providers —
+Anthropic, OpenAI, Google, and budget options like DeepSeek — all do well,
+and even their *smaller, faster tiers* are more than enough; you don't need
+a premium model for this. Tiny local models tend to produce invalid
+expressions — the preview catches them, but you'll have a better time with
+anything frontier.
 
 ---
 
