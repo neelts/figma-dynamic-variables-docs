@@ -153,6 +153,16 @@ Remember: helper code is **plain JS** — no `$` references inside it; resolve
 values in the expression and pass them as arguments. The `cd`/`cl` libraries
 *are* available inside helpers.
 
+### Migrating 1.x function-variables
+
+Before Global Functions existed, the trick was to store a lambda in a
+STRING variable — `((n) => n.reduce((a, b) => a + b, 0))` — and call it as
+`$Sum(…)` from other expressions. That still works, but there's a better
+home now: rows holding such a value show a **Migrate to Global Function**
+button, which converts the lambda into a named function in a *Migrated*
+Global Functions collection — callable as plain `Sum(…)`, editable with
+full syntax highlighting.
+
 ---
 
 ## Recipes
@@ -353,19 +363,43 @@ are your parity bridge — and code `MIGRATING` at
 [checkout](https://neelts.lemonsqueezy.com/buy/7753e037-3c90-404f-8cbb-508ba5bfc2eb?checkout[discount_code]=MIGRATING) acknowledges
 that switching takes work.
 
+## The editor *(2.0)*
+
+*Open Dynamic Variables Editor* is a real IDE for your variables, not a
+form:
+
+- **Autocomplete** for variable names, library functions and your Global
+  Functions as you type; **hover** a reference to preview its per-mode
+  values; errors appear **inline**, on the exact line.
+- **The `{{ }}` wrapper is hidden** by default — you edit just the
+  expression. The `{}` icon on a row toggles the full description view
+  (useful when a description mixes prose and an expression).
+- **Search** filters the variables of the open collection.
+- The window is **resizable** (corner grip) and the collections sidebar
+  drags to taste — both persist across sessions.
+
+---
+
 ## AI editing — describe it, don't code it *(2.0)*
 
-In the editor, the ✨ AI menu gives you a two-step loop that works with
+In the editor, the ✨ AI menu gives you a loop that works with
 **whatever assistant you already use** — no API key, no extra subscription:
 
 1. **Copy Brief for AI** — puts a complete brief on your clipboard: your
    collections, variables, current values, and the full expression syntax.
    Paste it into ChatGPT, Claude, Gemini — then ask in plain words:
    *"derive a 10-step ramp from brand/seed, and make button text pick black
-   or white by contrast."*
+   or white by contrast."* The brief dialog has a **target switch**: the
+   default brief expects a paste-back reply, while the **Figma Agent**
+   variant instructs Figma's own agent to edit your variables *directly* —
+   it can create variables and even author Global Functions, so there is
+   nothing to paste back.
 2. **Paste AI Result** — paste the assistant's reply back. The plugin parses
    it and shows a **preview of every proposed change** — old value → new
-   expression, per variable. Nothing touches your file until you apply.
+   expression, per variable. It can **update existing variables and create
+   new ones** (a proposed variable that doesn't exist yet shows a *create*
+   badge and lands in the named collection). Nothing touches your file
+   until you apply.
 
 **Models that do well** (from the plugin's own test harness — 20
 design-system scenarios): Claude Haiku 4.5, Codex and GPT-5-mini solve nearly
@@ -387,6 +421,13 @@ better time with the tier above.
   variables are renamed or moved.
 - **Library variables**: bring team-library variables into a local collection
   as aliases, then reference them like any local variable.
+- **Extended collections** (Figma Enterprise): if you use Figma's
+  *extend collection* feature, enable *Configure → Toggle Extended
+  Collections* — expressions then evaluate for the extended modes too,
+  respecting per-mode overrides. Off by default.
+- **Relaunch shortcut**: the plugin adds a relaunch button to the file;
+  *Configure → Set Shortcut Action* picks what it runs — Start Monitoring
+  (default), Update Once, or Open Editor.
 - **Sandbox limits**: expressions run in Figma's plugin sandbox — standard
   JavaScript plus `fetch` and the bundled libraries; no `window`/`document`,
   no npm imports. Shared helpers belong in Global Functions.
