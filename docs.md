@@ -79,11 +79,19 @@ so everything after it is ordinary JavaScript:
 {{ `${$$().name} — ${cd($('Brand/primary')).toHex()}` }}
 ```
 
-Props on the object: `name`, `id`, `type`, `alias`, `collection`,
+Props on the object: `name`, `id`, `type`, `alias`, `aliasOf`, `collection`,
 `collectionId`, `mode`, `modeIndex`, `modeId`, `modes` (array of mode names),
 `values` (array of the variable's values, ordered by mode). Names with
 slashes, spaces or dots all work, and the path may be computed —
 `$$('ramp/' + i).name`.
+
+`alias` is a Figma alias *to* that variable, for returning it. `aliasOf` is
+the metadata of the variable it aliases in the current mode, or `null` when
+it holds a plain value (always for `$$()`, whose value is being computed):
+
+```js
+{{ $$('Error/950 2').aliasOf.name }}   // "Error/950"
+```
 
 This is what makes **name-generic expressions** possible: a whole scale can
 share one expression that reads its own step from its name:
