@@ -81,9 +81,17 @@ so everything after it is ordinary JavaScript:
 
 Props on the object: `name`, `id`, `type`, `alias`, `aliasOf`, `collection`,
 `collectionId`, `mode`, `modeIndex`, `modeId`, `modes` (array of mode names),
-`values` (array of the variable's values, ordered by mode). Names with
-slashes, spaces or dots all work, and the path may be computed —
-`$$('ramp/' + i).name`.
+`values` (array of the variable's values, ordered by mode), `valuesByMode`
+(the same values keyed by mode name). Names with slashes, spaces or dots all
+work, and the path may be computed — `$$('ramp/' + i).name`.
+
+`values` follows the modes of *that variable's* collection, so from another
+collection pick a mode by name instead of by position:
+
+```js
+{{ $$('Layout/Organisms/Content').valuesByMode.Lg }}
+{{ $$('Theme/surface').valuesByMode['Dark mode'] }}
+```
 
 `alias` is a Figma alias *to* that variable, for returning it. `aliasOf` is
 the metadata of the variable it aliases in the current mode, or `null` when
