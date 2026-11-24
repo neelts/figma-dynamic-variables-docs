@@ -376,7 +376,7 @@ code/timing  → {{ $('Motion/duration') + "ms" }}           // Timing values ar
 
 🧳 Coming from Tokens Studio or another token pipeline? The recipes above
 are your parity bridge — and code `MIGRATING` at
-[checkout](https://neelts.lemonsqueezy.com/buy/7753e037-3c90-404f-8cbb-508ba5bfc2eb?checkout[discount_code]=MIGRATING) acknowledges
+[checkout](https://dv-license.dv-license-server.workers.dev/buy?code=MIGRATING) acknowledges
 that switching takes work.
 
 ## The editor *(2.0)*
@@ -481,8 +481,8 @@ AI-proposed changes always go through the preview first.
 ## Free & Pro
 
 Everything is free for up to **5** dynamic variables, forever. A
-full-featured trial (7 or 14 days depending on variant) has no cap.
-[Pro](https://neelts.lemonsqueezy.com/buy/7753e037-3c90-404f-8cbb-508ba5bfc2eb)
+7-day full-featured trial has no cap.
+[Pro](https://dv-license.dv-license-server.workers.dev/buy)
 removes the limit and funds development — activate via *Dynamic Variables →
 Pro License → Activate Key* (5 devices, 10 on Unlimited; write me for
 activation resets).
@@ -490,7 +490,7 @@ activation resets).
 ---
 
 🎓 **You read the whole thing.** That deserves something: use code
-`IREADTHEDOCS` at [checkout](https://neelts.lemonsqueezy.com/buy/7753e037-3c90-404f-8cbb-508ba5bfc2eb?checkout[discount_code]=IREADTHEDOCS)
+`IREADTHEDOCS` at [checkout](https://dv-license.dv-license-server.workers.dev/buy?code=IREADTHEDOCS)
 for a reader's discount on Pro. Thanks for caring about the details — you're
 exactly who this plugin is for.
 
